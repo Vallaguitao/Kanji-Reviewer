@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>漢字マスター — JLPT N5 Vocabulary Trainer</title>
+  <meta name="description" content="Master JLPT N5 vocabulary with flashcards, quizzes, typing practice, matching games, and spaced repetition. 800+ Japanese words with progress tracking." />
+  <meta name="theme-color" content="#1a1a2e" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Navigation -->
+    <nav class="nav" id="main-nav">
+      <div class="nav-brand">
+        <a href="#/dashboard" class="nav-logo">
+          <span class="nav-logo-jp">漢字</span>
+          <span class="nav-logo-en">マスター</span>
+        </a>
+      </div>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-links" id="nav-links">
+        <a href="#/dashboard" class="nav-link active" id="nav-dashboard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="#/flashcards" class="nav-link" id="nav-flashcards">
+          <span class="nav-icon">🃏</span>
+          <span class="nav-text">Flashcards</span>
+        </a>
+        <a href="#/quiz" class="nav-link" id="nav-quiz">
+          <span class="nav-icon">📝</span>
+          <span class="nav-text">Quiz</span>
+        </a>
+        <a href="#/typing" class="nav-link" id="nav-typing">
+          <span class="nav-icon">⌨️</span>
+          <span class="nav-text">Typing</span>
+        </a>
+        <a href="#/matching" class="nav-link" id="nav-matching">
+          <span class="nav-icon">🧩</span>
+          <span class="nav-text">Matching</span>
+        </a>
+        <a href="#/srs" class="nav-link" id="nav-srs">
+          <span class="nav-icon">🧠</span>
+          <span class="nav-text">SRS</span>
+        </a>
+        <a href="#/categories" class="nav-link" id="nav-categories">
+          <span class="nav-icon">📂</span>
+          <span class="nav-text">Browse</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="app-content" class="view view-enter">
+        <!-- Views are rendered here by app.js -->
+        <div class="loading-state">
+          <span class="loading-kanji">読み込み中...</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts (loaded in dependency order) -->
+  <script src="vocabulary.js"></script>
+  <script src="storage.js"></script>
+  <script src="srs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
