@@ -1,19 +1,50 @@
 /**
- * app.js — Main Application Logic
+ * app.js — Main Application Logic (v2)
  * SPA router, view rendering, and all study mode logic.
+ * Features: 5 quiz directions, kanji section, instructions, timers, difficulty filters
  */
 
 const App = (() => {
   let currentView = null;
   let currentCleanup = null;
 
+  // ─── Constants ──────────────────────────────────────────────
+
+  const DIRECTIONS = [
+    { id: 'jp2en', label: 'JP → EN', icon: '日→英', desc: 'Japanese word, pick English meaning' },
+    { id: 'en2jp', label: 'EN → JP', icon: '英→日', desc: 'English meaning, pick Japanese word' },
+    { id: 'hira2kanji', label: 'ひら→漢', icon: 'ひ→漢', desc: 'Hiragana reading, pick the Kanji' },
+    { id: 'kanji2hira', label: '漢→ひら', icon: '漢→ひ', desc: 'Kanji word, pick the Hiragana' },
+    { id: 'mix', label: 'Random Mix', icon: '🔀', desc: 'All types mixed randomly' },
+  ];
+
+  const DIFFICULTY_LEVELS = [
+    { id: 'all', label: '📚 All' },
+    { id: 'new', label: '🆕 New' },
+    { id: 'learning', label: '📖 Learning' },
+    { id: 'reviewing', label: '🔄 Reviewing' },
+    { id: 'mastered', label: '⭐ Mastered' },
+  ];
+
+  const TIPS = [
+    "💡 Practice 20 words daily for best retention",
+    "💡 Use SRS review to strengthen weak words",
+    "💡 Try different quiz directions to deepen understanding",
+    "💡 The Kanji section helps you recognize individual characters",
+    "💡 Flashcards are great for initial exposure to new words",
+    "💡 Typing practice reinforces spelling and recall",
+    "💡 The matching game is a fun way to review vocabulary",
+    "💡 Study consistently — even 5 minutes a day helps!",
+    "💡 Focus on words you get wrong more often",
+    "💡 Mix up your study modes to stay engaged",
+  ];
+
   // ─── Router ────────────────────────────────────────────────
 
   function init() {
+    if (typeof KanjiHelper !== 'undefined') KanjiHelper.init();
     window.addEventListener('hashchange', handleRoute);
     handleRoute();
-
-    // Update streak on first load
     Storage.updateStreak();
   }
 
@@ -21,23 +52,25 @@ const App = (() => {
     const hash = window.location.hash || '#/dashboard';
     const path = hash.replace('#/', '') || 'dashboard';
 
-    // Cleanup previous view
     if (currentCleanup) {
       currentCleanup();
       currentCleanup = null;
     }
 
-    // Update active nav link
     document.querySelectorAll('.nav-link').forEach(link => {
       link.classList.toggle('active', link.getAttribute('href') === '#/' + path);
     });
 
     const app = document.getElementById('app-content');
     app.classList.remove('view-enter');
-
-    // Force reflow for animation restart
     void app.offsetWidth;
     app.classList.add('view-enter');
+
+    // Track mode usage (not for dashboard/categories/kanji browse)
+    if (['flashcards', 'quiz', 'typing', 'matching', 'srs'].includes(path)) {
+      Storage.setLastMode(path);
+      Storage.incrementModeUsage(path);
+    }
 
     switch (path) {
       case 'dashboard': renderDashboard(app); break;
@@ -46,6 +79,7 @@ const App = (() => {
       case 'quiz': renderQuiz(app); break;
       case 'typing': renderTyping(app); break;
       case 'matching': renderMatching(app); break;
+      case 'kanji': renderKanji(app); break;
       case 'srs': renderSRS(app); break;
       default: renderDashboard(app); break;
     }
@@ -68,11 +102,6 @@ const App = (() => {
     return a;
   }
 
-  function getRandomItems(arr, count, exclude = []) {
-    const filtered = arr.filter(item => !exclude.includes(item.id));
-    return shuffleArray(filtered).slice(0, count);
-  }
-
   function levenshtein(a, b) {
     const matrix = Array.from({ length: b.length + 1 }, (_, i) =>
       Array.from({ length: a.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
@@ -91,15 +120,12 @@ const App = (() => {
     const a = input.toLowerCase().trim();
     const b = target.toLowerCase().trim();
     if (a === b) return true;
-    // Check if input matches any part of a multi-meaning target
     const parts = b.split(/[,;\/]/);
     for (const part of parts) {
       const trimmed = part.trim();
       if (a === trimmed) return true;
-      // Strip "to " prefix for verbs
       if (trimmed.startsWith('to ') && a === trimmed.substring(3)) return true;
       if (a.startsWith('to ') && a.substring(3) === trimmed) return true;
-      // Allow levenshtein distance of 1 for words > 3 chars
       if (trimmed.length > 3 && levenshtein(a, trimmed) <= 1) return true;
     }
     return false;
@@ -125,39 +151,151 @@ const App = (() => {
     return names[category] || category;
   }
 
-  // ─── Category Filter Component ─────────────────────────────
+  function getResultMessage(pct) {
+    if (pct >= 95) return '🌸 Perfect! You\'re a master! 🌸';
+    if (pct >= 80) return '🎯 Excellent work! Keep it up!';
+    if (pct >= 60) return '👍 Good progress! Keep studying!';
+    if (pct >= 40) return '💪 Getting there! Practice makes perfect!';
+    return '📚 Keep studying! You\'ll improve!';
+  }
 
-  function renderCategoryFilter(selectedCategory, onChange) {
-    const categories = ['all', ...Object.keys(N5_CATEGORIES)];
+  function getWordsWithKanji() {
+    return N5_VOCABULARY.filter(w => w.kanji !== w.reading);
+  }
+
+  function getFilteredWords(category, difficulty) {
+    let words = (!category || category === 'all') ? N5_VOCABULARY : N5_VOCABULARY.filter(w => w.category === category);
+    if (difficulty && difficulty !== 'all') {
+      words = words.filter(w => Storage.getWordMasteryLevel(w.id) === difficulty);
+    }
+    return words;
+  }
+
+  function getFilteredWordsForDirection(category, difficulty, direction) {
+    let words = getFilteredWords(category, difficulty);
+    if (direction === 'hira2kanji' || direction === 'kanji2hira') {
+      words = words.filter(w => w.kanji !== w.reading);
+    }
+    return words;
+  }
+
+  function pickDirection(selectedDirection) {
+    if (selectedDirection === 'mix') {
+      const dirs = ['jp2en', 'en2jp', 'hira2kanji', 'kanji2hira'];
+      return dirs[Math.floor(Math.random() * dirs.length)];
+    }
+    return selectedDirection;
+  }
+
+  // ─── Shared UI Components ──────────────────────────────────
+
+  function renderInstructions(title, items, shortcuts) {
     return `
-      <div class="category-filter">
-        ${categories.map(cat => `
-          <button class="filter-chip ${cat === selectedCategory ? 'active' : ''}" 
-                  data-category="${cat}">
-            ${cat === 'all' ? '📚 All' : getCategoryIcon(cat) + ' ' + getCategoryDisplayName(cat)}
-          </button>
-        `).join('')}
+      <div class="instructions-panel">
+        <button class="instructions-toggle" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open');">
+          <span>ℹ️ ${title}</span>
+          <span class="instructions-toggle-icon">▼</span>
+        </button>
+        <div class="instructions-content">
+          <ul>
+            ${items.map(i => `<li>${i}</li>`).join('')}
+          </ul>
+          ${shortcuts ? `<p style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.7;">⌨️ ${shortcuts}</p>` : ''}
+        </div>
       </div>
     `;
   }
 
-  function getFilteredWords(category) {
-    if (!category || category === 'all') return N5_VOCABULARY;
-    return N5_VOCABULARY.filter(w => w.category === category);
+  function renderDirectionSelector(selected) {
+    return `
+      <div class="setup-section">
+        <div class="setup-section-title"><span class="setup-section-icon">🎯</span> Quiz Direction</div>
+        <div class="direction-selector">
+          ${DIRECTIONS.map(d => `
+            <button class="direction-option ${d.id === selected ? 'active' : ''}" data-direction="${d.id}" title="${d.desc}">
+              <span class="direction-option-icon">${d.icon}</span>
+              <span class="direction-option-label">${d.label}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
   }
 
-  // ─── Session Selector Component ────────────────────────────
+  function renderCategoryFilter(selectedCategory) {
+    const categories = ['all', ...Object.keys(N5_CATEGORIES)];
+    return `
+      <div class="setup-section">
+        <div class="setup-section-title"><span class="setup-section-icon">📂</span> Category</div>
+        <div class="category-filter">
+          ${categories.map(cat => `
+            <button class="filter-chip ${cat === selectedCategory ? 'active' : ''}" data-category="${cat}">
+              ${cat === 'all' ? '📚 All' : getCategoryIcon(cat) + ' ' + getCategoryDisplayName(cat)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDifficultyFilter(selected) {
+    return `
+      <div class="setup-section">
+        <div class="setup-section-title"><span class="setup-section-icon">📊</span> Difficulty</div>
+        <div class="difficulty-filter">
+          ${DIFFICULTY_LEVELS.map(d => `
+            <button class="difficulty-chip ${d.id === selected ? 'active' : ''}" data-level="${d.id}">${d.label}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
 
   function renderSessionSelector(current) {
     return `
-      <div class="session-selector">
-        <span class="session-label">Cards:</span>
-        ${[10, 20, 50].map(n => `
-          <button class="session-btn ${n === current ? 'active' : ''}" data-count="${n}">${n}</button>
-        `).join('')}
-        <button class="session-btn ${current === -1 ? 'active' : ''}" data-count="-1">All</button>
+      <div class="setup-section">
+        <div class="setup-section-title"><span class="setup-section-icon">🔢</span> Session Size</div>
+        <div class="session-selector">
+          <span class="session-label">Cards:</span>
+          ${[10, 20, 50].map(n => `
+            <button class="session-btn ${n === current ? 'active' : ''}" data-count="${n}">${n}</button>
+          `).join('')}
+          <button class="session-btn ${current === -1 ? 'active' : ''}" data-count="-1">All</button>
+        </div>
       </div>
     `;
+  }
+
+  function renderTimerSelector(current) {
+    return `
+      <div class="setup-section">
+        <div class="setup-section-title"><span class="setup-section-icon">⏱️</span> Timer</div>
+        <div class="session-selector">
+          <span class="session-label">Per question:</span>
+          ${[0, 10, 15, 30].map(n => `
+            <button class="session-btn timer-option ${n === current ? 'active' : ''}" data-timer="${n}">${n === 0 ? 'Off' : n + 's'}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function bindSetupListeners(container, state, renderSetup) {
+    container.querySelectorAll('.direction-option').forEach(btn => {
+      btn.addEventListener('click', () => { state.direction = btn.dataset.direction; renderSetup(); });
+    });
+    container.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => { state.category = chip.dataset.category; renderSetup(); });
+    });
+    container.querySelectorAll('.difficulty-chip').forEach(chip => {
+      chip.addEventListener('click', () => { state.difficulty = chip.dataset.level; renderSetup(); });
+    });
+    container.querySelectorAll('.session-btn:not(.timer-option)').forEach(btn => {
+      if (btn.dataset.count) btn.addEventListener('click', () => { state.sessionSize = parseInt(btn.dataset.count); renderSetup(); });
+    });
+    container.querySelectorAll('.timer-option').forEach(btn => {
+      btn.addEventListener('click', () => { state.timer = parseInt(btn.dataset.timer); renderSetup(); });
+    });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -171,19 +309,33 @@ const App = (() => {
     const accuracy = Storage.getOverallAccuracy();
     const srsStats = SRS.getStats();
     const catProgress = Storage.getCategoryProgress();
+    const lastMode = Storage.getLastMode();
+    const modeUsage = Storage.getModeUsage();
 
-    const masteredPct = progress.total > 0 ? Math.round((progress.mastered / progress.total) * 100) : 0;
     const learnedPct = progress.total > 0 ? Math.round(((progress.mastered + progress.reviewing + progress.learning) / progress.total) * 100) : 0;
-
-    // SVG progress ring
     const radius = 58;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (learnedPct / 100) * circumference;
 
+    const tip = TIPS[Math.floor((Date.now() / 86400000) % TIPS.length)];
+
+    // Sort modes by usage
+    const modes = [
+      { id: 'flashcards', icon: '🃏', name: 'Flashcards', desc: 'Flip cards to reveal meanings' },
+      { id: 'quiz', icon: '📝', name: 'Multiple Choice', desc: 'Pick the correct answer' },
+      { id: 'typing', icon: '⌨️', name: 'Typing Practice', desc: 'Type the answer' },
+      { id: 'matching', icon: '🧩', name: 'Matching Game', desc: 'Match Japanese to English' },
+      { id: 'kanji', icon: '漢', name: 'Kanji Study', desc: 'Learn individual kanji' },
+      { id: 'srs', icon: '🧠', name: 'Spaced Repetition', desc: 'Smart review scheduling', badge: srsStats.dueCount > 0 ? srsStats.dueCount : null },
+    ];
+    modes.sort((a, b) => (modeUsage[b.id] || 0) - (modeUsage[a.id] || 0));
+
+    const modeNames = { flashcards: 'Flashcards', quiz: 'Quiz', typing: 'Typing', matching: 'Matching', kanji: 'Kanji', srs: 'SRS Review' };
+
     container.innerHTML = `
       <div class="dashboard">
         <div class="sakura-container" aria-hidden="true">
-          ${Array.from({length: 12}, (_, i) => `<div class="sakura-petal" style="--delay: ${i * 0.8}s; --x: ${Math.random() * 100}%; --duration: ${6 + Math.random() * 6}s; --drift: ${-30 + Math.random() * 60}px;"></div>`).join('')}
+          ${Array.from({length: 10}, (_, i) => `<div class="sakura-petal"></div>`).join('')}
         </div>
 
         <div class="dashboard-header">
@@ -200,13 +352,47 @@ const App = (() => {
           ` : ''}
         </div>
 
+        <!-- Quick Stats Bar -->
+        <div class="quick-stats-bar">
+          <div class="quick-stat">
+            <span class="quick-stat-value">${progress.total}</span>
+            <span class="quick-stat-label">Total Words</span>
+          </div>
+          <div class="quick-stat">
+            <span class="quick-stat-value accent">${progress.mastered + progress.reviewing + progress.learning}</span>
+            <span class="quick-stat-label">Learned</span>
+          </div>
+          <div class="quick-stat">
+            <span class="quick-stat-value wisteria">${srsStats.dueCount}</span>
+            <span class="quick-stat-label">Due Review</span>
+          </div>
+          <div class="quick-stat">
+            <span class="quick-stat-value gold">${todayStats.reviewed}/20</span>
+            <span class="quick-stat-label">Today's Goal</span>
+          </div>
+        </div>
+
+        <!-- Tip Banner -->
+        <div class="tip-banner">
+          <span class="tip-banner-icon">📌</span>
+          <span class="tip-banner-text">${tip}</span>
+        </div>
+
+        ${lastMode ? `
+          <div class="continue-section">
+            <a href="#/${lastMode}" class="btn btn-primary btn-lg continue-btn">
+              ▶ Continue ${modeNames[lastMode] || lastMode}
+            </a>
+          </div>
+        ` : ''}
+
         <div class="dashboard-grid">
           <!-- Progress Ring -->
           <div class="stat-card stat-card-progress">
             <div class="progress-ring-container">
               <svg class="progress-ring" width="140" height="140" viewBox="0 0 140 140">
                 <circle class="progress-ring-bg" cx="70" cy="70" r="${radius}" />
-                <circle class="progress-ring-fill" cx="70" cy="70" r="${radius}" 
+                <circle class="progress-ring-fill" cx="70" cy="70" r="${radius}"
                   style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset};" />
               </svg>
               <div class="progress-ring-text">
@@ -215,22 +401,10 @@ const App = (() => {
               </div>
             </div>
             <div class="progress-stats">
-              <div class="progress-stat">
-                <span class="stat-num">${progress.mastered}</span>
-                <span class="stat-lbl">Mastered</span>
-              </div>
-              <div class="progress-stat">
-                <span class="stat-num">${progress.reviewing}</span>
-                <span class="stat-lbl">Reviewing</span>
-              </div>
-              <div class="progress-stat">
-                <span class="stat-num">${progress.learning}</span>
-                <span class="stat-lbl">Learning</span>
-              </div>
-              <div class="progress-stat">
-                <span class="stat-num">${progress.new}</span>
-                <span class="stat-lbl">New</span>
-              </div>
+              <div class="progress-stat"><span class="stat-num">${progress.mastered}</span><span class="stat-lbl">Mastered</span></div>
+              <div class="progress-stat"><span class="stat-num">${progress.reviewing}</span><span class="stat-lbl">Reviewing</span></div>
+              <div class="progress-stat"><span class="stat-num">${progress.learning}</span><span class="stat-lbl">Learning</span></div>
+              <div class="progress-stat"><span class="stat-num">${progress.new}</span><span class="stat-lbl">New</span></div>
             </div>
           </div>
 
@@ -238,25 +412,14 @@ const App = (() => {
           <div class="stat-card stat-card-today">
             <h3 class="stat-card-title">Today's Study</h3>
             <div class="today-stats">
-              <div class="today-stat">
-                <span class="today-num">${todayStats.reviewed}</span>
-                <span class="today-lbl">Reviewed</span>
-              </div>
-              <div class="today-stat">
-                <span class="today-num">${todayStats.correct}</span>
-                <span class="today-lbl">Correct</span>
-              </div>
-              <div class="today-stat">
-                <span class="today-num">${Storage.getTodayAccuracy()}%</span>
-                <span class="today-lbl">Accuracy</span>
-              </div>
+              <div class="today-stat"><span class="today-num">${todayStats.reviewed}</span><span class="today-lbl">Reviewed</span></div>
+              <div class="today-stat"><span class="today-num">${todayStats.correct}</span><span class="today-lbl">Correct</span></div>
+              <div class="today-stat"><span class="today-num">${Storage.getTodayAccuracy()}%</span><span class="today-lbl">Accuracy</span></div>
             </div>
             ${accuracy > 0 ? `
               <div class="overall-accuracy">
                 <span class="accuracy-label">Overall Accuracy</span>
-                <div class="progress-bar">
-                  <div class="progress-bar-fill" style="width: ${accuracy}%"></div>
-                </div>
+                <div class="progress-bar"><div class="progress-bar-fill" style="width: ${accuracy}%"></div></div>
                 <span class="accuracy-value">${accuracy}%</span>
               </div>
             ` : ''}
@@ -267,16 +430,10 @@ const App = (() => {
             <h3 class="stat-card-title">Spaced Repetition</h3>
             <div class="srs-status">
               ${srsStats.dueCount > 0 ? `
-                <div class="srs-due-badge">
-                  <span class="srs-due-num">${srsStats.dueCount}</span>
-                  <span class="srs-due-label">cards due for review</span>
-                </div>
+                <div class="srs-due-badge"><span class="srs-due-num">${srsStats.dueCount}</span><span class="srs-due-label">cards due for review</span></div>
                 <a href="#/srs" class="btn btn-primary btn-sm">Review Now</a>
               ` : `
-                <div class="srs-caught-up">
-                  <span class="srs-emoji">🎉</span>
-                  <span>You're all caught up!</span>
-                </div>
+                <div class="srs-caught-up"><span class="srs-emoji">🎉</span><span>You're all caught up!</span></div>
               `}
             </div>
           </div>
@@ -285,48 +442,16 @@ const App = (() => {
         <!-- Study Modes -->
         <h2 class="section-title">Study Modes</h2>
         <div class="mode-grid">
-          <a href="#/flashcards" class="mode-card" id="mode-flashcards">
-            <div class="mode-icon">🃏</div>
-            <div class="mode-info">
-              <h3>Flashcards</h3>
-              <p>Flip cards to reveal meanings</p>
-            </div>
-          </a>
-          <a href="#/quiz" class="mode-card" id="mode-quiz">
-            <div class="mode-icon">📝</div>
-            <div class="mode-info">
-              <h3>Multiple Choice</h3>
-              <p>Pick the correct meaning</p>
-            </div>
-          </a>
-          <a href="#/typing" class="mode-card" id="mode-typing">
-            <div class="mode-icon">⌨️</div>
-            <div class="mode-info">
-              <h3>Typing Practice</h3>
-              <p>Type the English meaning</p>
-            </div>
-          </a>
-          <a href="#/matching" class="mode-card" id="mode-matching">
-            <div class="mode-icon">🧩</div>
-            <div class="mode-info">
-              <h3>Matching Game</h3>
-              <p>Match Japanese to English</p>
-            </div>
-          </a>
-          <a href="#/srs" class="mode-card mode-card-srs" id="mode-srs">
-            <div class="mode-icon">🧠</div>
-            <div class="mode-info">
-              <h3>Spaced Repetition</h3>
-              <p>Smart review scheduling</p>
-            </div>
-            ${srsStats.dueCount > 0 ? `<span class="mode-badge">${srsStats.dueCount}</span>` : ''}
-          </a>
+          ${modes.map(m => `
+            <a href="#/${m.id}" class="mode-card" id="mode-${m.id}">
+              <div class="mode-icon">${m.icon}</div>
+              <div class="mode-info"><h3>${m.name}</h3><p>${m.desc}</p></div>
+              ${m.badge ? `<span class="mode-badge">${m.badge}</span>` : ''}
+            </a>
+          `).join('')}
           <a href="#/categories" class="mode-card" id="mode-categories">
             <div class="mode-icon">📂</div>
-            <div class="mode-info">
-              <h3>Browse Words</h3>
-              <p>Explore by category</p>
-            </div>
+            <div class="mode-info"><h3>Browse Words</h3><p>Explore by category</p></div>
           </a>
         </div>
 
@@ -343,16 +468,31 @@ const App = (() => {
                     <span class="cat-prog-name">${getCategoryDisplayName(cat)}</span>
                     <span class="cat-prog-pct">${pct}%</span>
                   </div>
-                  <div class="progress-bar">
-                    <div class="progress-bar-fill" style="width: ${pct}%; --bar-color: ${N5_CATEGORIES[cat]?.color || 'var(--accent-sakura)'}"></div>
-                  </div>
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width: ${pct}%; --bar-color: ${N5_CATEGORIES[cat]?.color || 'var(--accent-sakura)'}"></div></div>
                 </div>
               `;
             }).join('')}
           </div>
         ` : ''}
+
+        <!-- Settings / Reset -->
+        <div class="settings-section">
+          <h3 class="settings-title">⚙️ Settings</h3>
+          <div class="danger-zone">
+            <p>Reset all progress, streaks, and study data. This action cannot be undone.</p>
+            <button class="btn btn-danger btn-sm" id="reset-btn">🗑️ Reset All Progress</button>
+          </div>
+        </div>
       </div>
     `;
+
+    // Reset handler
+    document.getElementById('reset-btn')?.addEventListener('click', () => {
+      if (confirm('⚠️ Are you sure? This will erase ALL your progress, streaks, and study data. This cannot be undone.')) {
+        Storage.resetAllData();
+        renderDashboard(container);
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -361,8 +501,6 @@ const App = (() => {
 
   function renderCategories(container) {
     const catProgress = Storage.getCategoryProgress();
-
-    // Group words by category
     const categories = {};
     for (const word of N5_VOCABULARY) {
       if (!categories[word.category]) categories[word.category] = [];
@@ -375,11 +513,9 @@ const App = (() => {
           <h1>Browse Vocabulary</h1>
           <p class="view-subtitle">${N5_VOCABULARY.length} words across ${Object.keys(categories).length} categories</p>
         </div>
-
         <div class="search-bar-container">
           <input type="text" id="word-search" class="search-input" placeholder="Search words..." autocomplete="off" />
         </div>
-
         <div class="category-grid" id="category-grid">
           ${Object.entries(categories).map(([cat, words]) => {
             const cp = catProgress[cat] || { total: words.length, mastered: 0, reviewing: 0 };
@@ -388,20 +524,14 @@ const App = (() => {
               <div class="category-card" data-category="${cat}">
                 <div class="category-card-header">
                   <span class="category-icon" style="color: ${N5_CATEGORIES[cat]?.color || 'var(--accent-sakura)'}">${getCategoryIcon(cat)}</span>
-                  <div>
-                    <h3>${getCategoryDisplayName(cat)}</h3>
-                    <span class="category-count">${words.length} words</span>
-                  </div>
+                  <div><h3>${getCategoryDisplayName(cat)}</h3><span class="category-count">${words.length} words</span></div>
                 </div>
-                <div class="progress-bar progress-bar-sm">
-                  <div class="progress-bar-fill" style="width: ${pct}%; --bar-color: ${N5_CATEGORIES[cat]?.color || 'var(--accent-sakura)'}"></div>
-                </div>
+                <div class="progress-bar progress-bar-sm"><div class="progress-bar-fill" style="width: ${pct}%; --bar-color: ${N5_CATEGORIES[cat]?.color || 'var(--accent-sakura)'}"></div></div>
                 <span class="category-pct">${pct}% mastered</span>
               </div>
             `;
           }).join('')}
         </div>
-
         <div id="word-list-panel" class="word-list-panel" style="display:none;">
           <button class="btn btn-secondary btn-sm" id="back-to-categories">← Back</button>
           <h2 id="word-list-title"></h2>
@@ -410,15 +540,13 @@ const App = (() => {
       </div>
     `;
 
-    // Event handlers
     const grid = document.getElementById('category-grid');
     const panel = document.getElementById('word-list-panel');
 
     grid.addEventListener('click', e => {
       const card = e.target.closest('.category-card');
       if (!card) return;
-      const cat = card.dataset.category;
-      showWordList(cat, categories[cat]);
+      showWordList(card.dataset.category, categories[card.dataset.category]);
     });
 
     document.getElementById('back-to-categories').addEventListener('click', () => {
@@ -427,36 +555,22 @@ const App = (() => {
       document.querySelector('.search-bar-container').style.display = '';
     });
 
-    // Search
     const searchInput = document.getElementById('word-search');
     searchInput.addEventListener('input', () => {
       const query = searchInput.value.toLowerCase().trim();
-      if (query.length === 0) {
-        grid.style.display = '';
-        panel.style.display = 'none';
-        return;
-      }
-
-      const results = N5_VOCABULARY.filter(w =>
-        w.kanji.includes(query) ||
-        w.reading.includes(query) ||
-        w.meaning.toLowerCase().includes(query)
-      );
-
+      if (query.length === 0) { grid.style.display = ''; panel.style.display = 'none'; return; }
+      const results = N5_VOCABULARY.filter(w => w.kanji.includes(query) || w.reading.includes(query) || w.meaning.toLowerCase().includes(query));
       showWordList(`Search: "${searchInput.value}"`, results);
     });
 
     function showWordList(title, words) {
       grid.style.display = 'none';
-      document.querySelector('.search-bar-container').style.display = '';
       panel.style.display = '';
       document.getElementById('word-list-title').textContent = typeof title === 'string' && !title.startsWith('Search') ? getCategoryDisplayName(title) : title;
-      const list = document.getElementById('word-list');
-      list.innerHTML = words.map(w => {
+      document.getElementById('word-list').innerHTML = words.map(w => {
         const mastery = Storage.getWordMasteryLevel(w.id);
-        const masteryClass = `mastery-${mastery}`;
         return `
-          <div class="word-item ${masteryClass}">
+          <div class="word-item">
             <div class="word-japanese">
               <span class="word-kanji">${w.kanji}</span>
               ${w.kanji !== w.reading ? `<span class="word-reading">${w.reading}</span>` : ''}
@@ -474,64 +588,44 @@ const App = (() => {
   // ═══════════════════════════════════════════════════════════
 
   function renderFlashcards(container) {
-    let selectedCategory = 'all';
-    let sessionSize = 20;
-    let cards = [];
-    let currentIndex = 0;
-    let isFlipped = false;
-    let sessionCorrect = 0;
-    let sessionTotal = 0;
+    let state = { category: 'all', sessionSize: 20, difficulty: 'all' };
+    let cards = [], currentIndex = 0, isFlipped = false, actionsShown = false, sessionCorrect = 0, sessionTotal = 0;
     let keyHandler = null;
 
     function startSession() {
-      const pool = getFilteredWords(selectedCategory);
-      const count = sessionSize === -1 ? pool.length : Math.min(sessionSize, pool.length);
+      const pool = getFilteredWords(state.category, state.difficulty);
+      if (pool.length === 0) { container.innerHTML = emptyState('No words match your filters', 'Try changing category or difficulty.'); return; }
+      const count = state.sessionSize === -1 ? pool.length : Math.min(state.sessionSize, pool.length);
       cards = shuffleArray(pool).slice(0, count);
-      currentIndex = 0;
-      isFlipped = false;
-      sessionCorrect = 0;
-      sessionTotal = 0;
+      currentIndex = 0; isFlipped = false; actionsShown = false; sessionCorrect = 0; sessionTotal = 0;
       renderCard();
     }
 
     function renderSetup() {
       container.innerHTML = `
         <div class="study-setup">
-          <div class="view-header">
-            <h1>🃏 Flashcards</h1>
-            <p class="view-subtitle">Flip cards to test your knowledge</p>
-          </div>
-          ${renderCategoryFilter(selectedCategory)}
-          ${renderSessionSelector(sessionSize)}
-          <button class="btn btn-primary btn-lg" id="start-flashcards">Start Studying</button>
+          <div class="view-header"><h1>🃏 Flashcards</h1><p class="view-subtitle">Flip cards to test your knowledge</p></div>
+          ${renderInstructions('How to Play', [
+            'A Japanese word is shown on the front of the card',
+            'Click or tap the card to flip it and reveal the English meaning',
+            'Click again to flip back — you can toggle freely!',
+            'Rate yourself: <strong>Know</strong> ✓ or <strong>Don\'t Know</strong> ✕',
+            'Swipe right = Know, Swipe left = Don\'t Know (mobile)',
+          ], 'Space: Flip | →: Know | ←: Don\'t Know')}
+          ${renderCategoryFilter(state.category)}
+          ${renderDifficultyFilter(state.difficulty)}
+          ${renderSessionSelector(state.sessionSize)}
+          <button class="btn btn-primary btn-lg" id="start-btn">Start Studying</button>
         </div>
       `;
-
-      container.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          selectedCategory = chip.dataset.category;
-          renderSetup();
-        });
-      });
-
-      container.querySelectorAll('.session-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          sessionSize = parseInt(btn.dataset.count);
-          renderSetup();
-        });
-      });
-
-      document.getElementById('start-flashcards').addEventListener('click', startSession);
+      bindSetupListeners(container, state, renderSetup);
+      document.getElementById('start-btn').addEventListener('click', startSession);
     }
 
     function renderCard() {
-      if (currentIndex >= cards.length) {
-        renderResults();
-        return;
-      }
-
+      if (currentIndex >= cards.length) { renderResults(); return; }
       const word = cards[currentIndex];
-      isFlipped = false;
+      isFlipped = false; actionsShown = false;
 
       container.innerHTML = `
         <div class="flashcard-view">
@@ -545,7 +639,7 @@ const App = (() => {
               </div>
               <div class="flashcard-back">
                 <span class="flashcard-meaning">${word.meaning}</span>
-                <span class="tag tag-${word.category}">${getCategoryDisplayName(word.category)}</span>
+                <span class="tag">${getCategoryDisplayName(word.category)}</span>
               </div>
             </div>
           </div>
@@ -553,9 +647,7 @@ const App = (() => {
             <button class="btn btn-danger" id="fc-dont-know">✕ Don't Know</button>
             <button class="btn btn-success" id="fc-know">✓ Know</button>
           </div>
-          <div class="keyboard-hints">
-            <span>Space: Flip</span> <span>←: Don't Know</span> <span>→: Know</span>
-          </div>
+          <div class="keyboard-hints"><span>Space: Flip</span> <span>←: Don't Know</span> <span>→: Know</span></div>
         </div>
       `;
 
@@ -563,30 +655,24 @@ const App = (() => {
       const actions = document.getElementById('flashcard-actions');
 
       flashcard.addEventListener('click', () => {
-        if (!isFlipped) {
-          isFlipped = true;
-          flashcard.classList.add('flipped');
-          actions.style.visibility = 'visible';
-        }
+        isFlipped = !isFlipped;
+        flashcard.classList.toggle('flipped');
+        if (!actionsShown) { actions.style.visibility = 'visible'; actionsShown = true; }
       });
 
       document.getElementById('fc-know').addEventListener('click', () => answer(true));
       document.getElementById('fc-dont-know').addEventListener('click', () => answer(false));
 
-      // Touch swipe support
       let touchStartX = 0;
       flashcard.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
       flashcard.addEventListener('touchend', e => {
         const diff = e.changedTouches[0].screenX - touchStartX;
-        if (isFlipped && Math.abs(diff) > 50) {
-          answer(diff > 0); // Swipe right = know, swipe left = don't know
-        }
+        if (actionsShown && Math.abs(diff) > 50) answer(diff > 0);
       }, { passive: true });
     }
 
     function answer(correct) {
-      const word = cards[currentIndex];
-      Storage.recordAnswer(word.id, correct);
+      Storage.recordAnswer(cards[currentIndex].id, correct);
       Storage.updateStreak();
       if (correct) sessionCorrect++;
       sessionTotal++;
@@ -597,47 +683,38 @@ const App = (() => {
     function renderResults() {
       const pct = sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0;
       container.innerHTML = `
-        <div class="results-view">
-          <div class="results-card">
-            <h2>Session Complete!</h2>
-            <div class="results-score">
-              <span class="results-pct">${pct}%</span>
-              <span class="results-label">${sessionCorrect} / ${sessionTotal} correct</span>
-            </div>
-            <div class="results-message">${getResultMessage(pct)}</div>
-            <div class="results-actions">
-              <button class="btn btn-primary" id="fc-restart">Study Again</button>
-              <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
-            </div>
+        <div class="results-view"><div class="results-card">
+          <h2>Session Complete!</h2>
+          <div class="results-score"><span class="results-pct">${pct}%</span><span class="results-label">${sessionCorrect} / ${sessionTotal} correct</span></div>
+          <div class="results-message">${getResultMessage(pct)}</div>
+          <div class="results-actions">
+            <button class="btn btn-primary" id="restart-btn">Study Again</button>
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
           </div>
-        </div>
+        </div></div>
       `;
-      document.getElementById('fc-restart').addEventListener('click', () => renderSetup());
+      document.getElementById('restart-btn').addEventListener('click', () => renderSetup());
     }
 
-    // Keyboard handler
     keyHandler = (e) => {
       if (currentView !== 'flashcards') return;
       if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         const fc = document.getElementById('flashcard');
-        if (fc && !isFlipped) {
-          isFlipped = true;
-          fc.classList.add('flipped');
-          const actions = document.getElementById('flashcard-actions');
-          if (actions) actions.style.visibility = 'visible';
+        if (fc) {
+          isFlipped = !isFlipped;
+          fc.classList.toggle('flipped');
+          if (!actionsShown) {
+            const actions = document.getElementById('flashcard-actions');
+            if (actions) actions.style.visibility = 'visible';
+            actionsShown = true;
+          }
         }
-      } else if (e.key === 'ArrowRight' && isFlipped) {
-        answer(true);
-      } else if (e.key === 'ArrowLeft' && isFlipped) {
-        answer(false);
-      }
+      } else if (e.key === 'ArrowRight' && actionsShown) { answer(true); }
+      else if (e.key === 'ArrowLeft' && actionsShown) { answer(false); }
     };
     document.addEventListener('keydown', keyHandler);
-    currentCleanup = () => {
-      document.removeEventListener('keydown', keyHandler);
-    };
-
+    currentCleanup = () => document.removeEventListener('keydown', keyHandler);
     renderSetup();
   }
 
@@ -646,135 +723,162 @@ const App = (() => {
   // ═══════════════════════════════════════════════════════════
 
   function renderQuiz(container) {
-    let selectedCategory = 'all';
-    let sessionSize = 20;
-    let questions = [];
-    let currentIndex = 0;
-    let score = 0;
-    let answered = false;
+    let state = { category: 'all', sessionSize: 20, difficulty: 'all', direction: 'jp2en', timer: 0 };
+    let questions = [], currentIndex = 0, score = 0, answered = false;
+    let timerInterval = null, timerRemaining = 0;
 
     function startSession() {
-      const pool = getFilteredWords(selectedCategory);
-      const count = sessionSize === -1 ? pool.length : Math.min(sessionSize, pool.length);
+      const dir = state.direction === 'mix' ? 'jp2en' : state.direction;
+      const pool = getFilteredWordsForDirection(state.category, state.difficulty, dir);
+      if (pool.length < 4) { container.innerHTML = emptyState('Not enough words', 'Need at least 4 words. Try changing filters.'); return; }
+      const count = state.sessionSize === -1 ? pool.length : Math.min(state.sessionSize, pool.length);
       questions = shuffleArray(pool).slice(0, count);
-      currentIndex = 0;
-      score = 0;
-      answered = false;
+      currentIndex = 0; score = 0; answered = false;
       renderQuestion();
     }
 
     function renderSetup() {
       container.innerHTML = `
         <div class="study-setup">
-          <div class="view-header">
-            <h1>📝 Multiple Choice Quiz</h1>
-            <p class="view-subtitle">Pick the correct English meaning</p>
-          </div>
-          ${renderCategoryFilter(selectedCategory)}
-          ${renderSessionSelector(sessionSize)}
-          <button class="btn btn-primary btn-lg" id="start-quiz">Start Quiz</button>
+          <div class="view-header"><h1>📝 Multiple Choice Quiz</h1><p class="view-subtitle">Pick the correct answer</p></div>
+          ${renderInstructions('How to Play', [
+            '<strong>JP → EN:</strong> See a Japanese word, pick the English meaning',
+            '<strong>EN → JP:</strong> See an English meaning, pick the Japanese word',
+            '<strong>ひら → 漢:</strong> See hiragana, pick the matching kanji word',
+            '<strong>漢 → ひら:</strong> See a kanji word, pick the correct hiragana reading',
+            '<strong>Random Mix:</strong> All types shuffled randomly!',
+            'Correct answers glow green, wrong answers shake red',
+          ])}
+          ${renderDirectionSelector(state.direction)}
+          ${renderCategoryFilter(state.category)}
+          ${renderDifficultyFilter(state.difficulty)}
+          ${renderSessionSelector(state.sessionSize)}
+          ${renderTimerSelector(state.timer)}
+          <button class="btn btn-primary btn-lg" id="start-btn">Start Quiz</button>
         </div>
       `;
-
-      container.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          selectedCategory = chip.dataset.category;
-          renderSetup();
-        });
-      });
-
-      container.querySelectorAll('.session-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          sessionSize = parseInt(btn.dataset.count);
-          renderSetup();
-        });
-      });
-
-      document.getElementById('start-quiz').addEventListener('click', startSession);
+      bindSetupListeners(container, state, renderSetup);
+      document.getElementById('start-btn').addEventListener('click', startSession);
     }
 
     function renderQuestion() {
-      if (currentIndex >= questions.length) {
-        renderQuizResults();
-        return;
+      if (currentIndex >= questions.length) { renderQuizResults(); return; }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      answered = false;
+      const word = questions[currentIndex];
+      const dir = pickDirection(state.direction);
+
+      // Build question and options based on direction
+      let questionDisplay, optionField, correctAnswer;
+      let pool = (dir === 'hira2kanji' || dir === 'kanji2hira') ? getWordsWithKanji() : N5_VOCABULARY;
+      let sameCategory = pool.filter(w => w.category === word.category && w.id !== word.id);
+      if (sameCategory.length < 3) sameCategory = pool.filter(w => w.id !== word.id);
+      const distractors = shuffleArray(sameCategory).slice(0, 3);
+
+      switch (dir) {
+        case 'jp2en':
+          questionDisplay = `<span class="quiz-reading">${word.kanji !== word.reading ? word.reading : ''}</span><span class="quiz-word">${word.kanji}</span>`;
+          correctAnswer = word.meaning;
+          optionField = 'meaning';
+          break;
+        case 'en2jp':
+          questionDisplay = `<span class="quiz-word" style="font-family: var(--font-body)">${word.meaning}</span>`;
+          correctAnswer = word.kanji;
+          optionField = 'kanji';
+          break;
+        case 'hira2kanji':
+          questionDisplay = `<span class="quiz-word">${word.reading}</span><span class="quiz-reading" style="margin-top: 0.5rem">Pick the kanji</span>`;
+          correctAnswer = word.kanji;
+          optionField = 'kanji';
+          break;
+        case 'kanji2hira':
+          questionDisplay = `<span class="quiz-word">${word.kanji}</span><span class="quiz-reading" style="margin-top: 0.5rem">Pick the reading</span>`;
+          correctAnswer = word.reading;
+          optionField = 'reading';
+          break;
       }
 
-      const word = questions[currentIndex];
-      answered = false;
-
-      // Generate distractors from the same category if possible
-      let pool = N5_VOCABULARY.filter(w => w.category === word.category && w.id !== word.id);
-      if (pool.length < 3) pool = N5_VOCABULARY.filter(w => w.id !== word.id);
-      const distractors = shuffleArray(pool).slice(0, 3);
-      const options = shuffleArray([word, ...distractors]);
+      const allOptions = shuffleArray([word, ...distractors]);
 
       container.innerHTML = `
         <div class="quiz-view">
+          ${state.timer > 0 ? `<div class="countdown-bar" id="countdown-bar" style="width: 100%"></div>` : ''}
           <div class="quiz-header">
             <div class="card-counter">${currentIndex + 1} / ${questions.length}</div>
             <div class="quiz-score">Score: ${score}</div>
           </div>
-          <div class="quiz-word-container">
-            <span class="quiz-reading">${word.kanji !== word.reading ? word.reading : ''}</span>
-            <span class="quiz-word">${word.kanji}</span>
-          </div>
+          <div class="quiz-word-container">${questionDisplay}</div>
           <div class="quiz-options" id="quiz-options">
-            ${options.map((opt, i) => `
+            ${allOptions.map(opt => `
               <button class="quiz-option" data-id="${opt.id}" data-correct="${opt.id === word.id}">
-                ${opt.meaning}
+                ${opt[optionField]}
               </button>
             `).join('')}
           </div>
         </div>
       `;
 
+      // Timer
+      if (state.timer > 0) {
+        timerRemaining = state.timer;
+        const bar = document.getElementById('countdown-bar');
+        timerInterval = setInterval(() => {
+          timerRemaining -= 0.1;
+          if (bar) {
+            const pct = Math.max(0, (timerRemaining / state.timer) * 100);
+            bar.style.width = pct + '%';
+            bar.classList.toggle('warning', timerRemaining <= 5 && timerRemaining > 3);
+            bar.classList.toggle('danger', timerRemaining <= 3);
+          }
+          if (timerRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            if (!answered) { handleTimeout(word); }
+          }
+        }, 100);
+      }
+
       document.querySelectorAll('.quiz-option').forEach(btn => {
         btn.addEventListener('click', () => {
           if (answered) return;
           answered = true;
-
+          if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
           const isCorrect = btn.dataset.correct === 'true';
           Storage.recordAnswer(word.id, isCorrect);
           Storage.updateStreak();
-
-          if (isCorrect) {
-            score++;
-            btn.classList.add('correct');
-          } else {
-            btn.classList.add('wrong');
-            // Highlight the correct answer
-            document.querySelector(`.quiz-option[data-correct="true"]`).classList.add('correct');
-          }
-
-          setTimeout(() => {
-            currentIndex++;
-            renderQuestion();
-          }, 1200);
+          if (isCorrect) { score++; btn.classList.add('correct'); }
+          else { btn.classList.add('wrong'); document.querySelector('.quiz-option[data-correct="true"]').classList.add('correct'); }
+          setTimeout(() => { currentIndex++; renderQuestion(); }, 1200);
         });
       });
     }
 
-    function renderQuizResults() {
-      const pct = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
-      container.innerHTML = `
-        <div class="results-view">
-          <div class="results-card">
-            <h2>Quiz Complete!</h2>
-            <div class="results-score">
-              <span class="results-pct">${pct}%</span>
-              <span class="results-label">${score} / ${questions.length} correct</span>
-            </div>
-            <div class="results-message">${getResultMessage(pct)}</div>
-            <div class="results-actions">
-              <button class="btn btn-primary" id="quiz-restart">Try Again</button>
-              <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('quiz-restart').addEventListener('click', () => renderSetup());
+    function handleTimeout(word) {
+      answered = true;
+      Storage.recordAnswer(word.id, false);
+      document.querySelector('.quiz-option[data-correct="true"]')?.classList.add('correct');
+      document.querySelectorAll('.quiz-option:not([data-correct="true"])').forEach(b => b.classList.add('wrong'));
+      setTimeout(() => { currentIndex++; renderQuestion(); }, 1200);
     }
 
+    function renderQuizResults() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      const pct = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+      container.innerHTML = `
+        <div class="results-view"><div class="results-card">
+          <h2>Quiz Complete!</h2>
+          <div class="results-score"><span class="results-pct">${pct}%</span><span class="results-label">${score} / ${questions.length} correct</span></div>
+          <div class="results-message">${getResultMessage(pct)}</div>
+          <div class="results-actions">
+            <button class="btn btn-primary" id="restart-btn">Try Again</button>
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
+          </div>
+        </div></div>
+      `;
+      document.getElementById('restart-btn').addEventListener('click', () => renderSetup());
+    }
+
+    currentCleanup = () => { if (timerInterval) clearInterval(timerInterval); };
     renderSetup();
   }
 
@@ -783,78 +887,81 @@ const App = (() => {
   // ═══════════════════════════════════════════════════════════
 
   function renderTyping(container) {
-    let selectedCategory = 'all';
-    let sessionSize = 20;
-    let words = [];
-    let currentIndex = 0;
-    let score = 0;
-    let streak = 0;
-    let bestStreak = 0;
+    let state = { category: 'all', sessionSize: 20, difficulty: 'all', direction: 'jp2en' };
+    let words = [], currentIndex = 0, score = 0, streak = 0, bestStreak = 0;
 
     function startSession() {
-      const pool = getFilteredWords(selectedCategory);
-      const count = sessionSize === -1 ? pool.length : Math.min(sessionSize, pool.length);
+      const pool = getFilteredWordsForDirection(state.category, state.difficulty, state.direction === 'mix' ? 'jp2en' : state.direction);
+      if (pool.length === 0) { container.innerHTML = emptyState('No words match your filters', 'Try changing category or difficulty.'); return; }
+      const count = state.sessionSize === -1 ? pool.length : Math.min(state.sessionSize, pool.length);
       words = shuffleArray(pool).slice(0, count);
-      currentIndex = 0;
-      score = 0;
-      streak = 0;
-      bestStreak = 0;
+      currentIndex = 0; score = 0; streak = 0; bestStreak = 0;
       renderPrompt();
     }
 
     function renderSetup() {
       container.innerHTML = `
         <div class="study-setup">
-          <div class="view-header">
-            <h1>⌨️ Typing Practice</h1>
-            <p class="view-subtitle">Type the English meaning</p>
-          </div>
-          ${renderCategoryFilter(selectedCategory)}
-          ${renderSessionSelector(sessionSize)}
-          <button class="btn btn-primary btn-lg" id="start-typing">Start Practicing</button>
+          <div class="view-header"><h1>⌨️ Typing Practice</h1><p class="view-subtitle">Type the correct answer</p></div>
+          ${renderInstructions('How to Play', [
+            '<strong>JP → EN:</strong> See Japanese, type the English meaning',
+            '<strong>EN → JP:</strong> See English, type the hiragana reading',
+            '<strong>ひら → 漢:</strong> See hiragana, type the kanji word',
+            '<strong>漢 → ひら:</strong> See kanji, type the hiragana reading',
+            'Fuzzy matching is enabled — small typos are forgiven!',
+            'Case-insensitive, and "to eat" matches "eat" for verbs',
+            'Press <kbd>Enter</kbd> to submit, or click <strong>Check</strong>',
+          ], 'Enter: Submit | Skip button available')}
+          ${renderDirectionSelector(state.direction)}
+          ${renderCategoryFilter(state.category)}
+          ${renderDifficultyFilter(state.difficulty)}
+          ${renderSessionSelector(state.sessionSize)}
+          <button class="btn btn-primary btn-lg" id="start-btn">Start Practicing</button>
         </div>
       `;
-
-      container.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          selectedCategory = chip.dataset.category;
-          renderSetup();
-        });
-      });
-
-      container.querySelectorAll('.session-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          sessionSize = parseInt(btn.dataset.count);
-          renderSetup();
-        });
-      });
-
-      document.getElementById('start-typing').addEventListener('click', startSession);
+      bindSetupListeners(container, state, renderSetup);
+      document.getElementById('start-btn').addEventListener('click', startSession);
     }
 
     function renderPrompt() {
-      if (currentIndex >= words.length) {
-        renderTypingResults();
-        return;
-      }
-
+      if (currentIndex >= words.length) { renderTypingResults(); return; }
       const word = words[currentIndex];
+      const dir = pickDirection(state.direction);
+
+      let promptDisplay, expectedAnswer, placeholder;
+      switch (dir) {
+        case 'jp2en':
+          promptDisplay = `<span class="typing-reading">${word.kanji !== word.reading ? word.reading : ''}</span><span class="typing-kanji">${word.kanji}</span>`;
+          expectedAnswer = word.meaning;
+          placeholder = 'Type the English meaning...';
+          break;
+        case 'en2jp':
+          promptDisplay = `<span class="typing-kanji" style="font-family: var(--font-body); font-size: 2rem">${word.meaning}</span>`;
+          expectedAnswer = word.reading;
+          placeholder = 'Type the hiragana reading...';
+          break;
+        case 'hira2kanji':
+          promptDisplay = `<span class="typing-kanji">${word.reading}</span><span class="typing-reading">Type the kanji</span>`;
+          expectedAnswer = word.kanji;
+          placeholder = 'Type the kanji...';
+          break;
+        case 'kanji2hira':
+          promptDisplay = `<span class="typing-kanji">${word.kanji}</span><span class="typing-reading">Type the reading</span>`;
+          expectedAnswer = word.reading;
+          placeholder = 'Type the hiragana reading...';
+          break;
+      }
 
       container.innerHTML = `
         <div class="typing-view">
           <div class="typing-header">
             <div class="card-counter">${currentIndex + 1} / ${words.length}</div>
-            <div class="typing-streak ${streak > 0 ? 'active' : ''}">
-              ${streak > 0 ? `🔥 ${streak} streak` : ''}
-            </div>
+            <div class="typing-streak ${streak > 0 ? 'active' : ''}">${streak > 0 ? `🔥 ${streak} streak` : ''}</div>
             <div class="quiz-score">Score: ${score}</div>
           </div>
-          <div class="typing-prompt">
-            <span class="typing-reading">${word.kanji !== word.reading ? word.reading : ''}</span>
-            <span class="typing-kanji">${word.kanji}</span>
-          </div>
+          <div class="typing-prompt">${promptDisplay}</div>
           <div class="typing-input-container">
-            <input type="text" id="typing-input" class="typing-input" placeholder="Type the English meaning..." autocomplete="off" autofocus />
+            <input type="text" id="typing-input" class="typing-input" placeholder="${placeholder}" autocomplete="off" autofocus />
             <button class="btn btn-primary" id="typing-submit">Check</button>
           </div>
           <div class="typing-feedback" id="typing-feedback"></div>
@@ -863,78 +970,55 @@ const App = (() => {
       `;
 
       const input = document.getElementById('typing-input');
-      const submitBtn = document.getElementById('typing-submit');
       const feedback = document.getElementById('typing-feedback');
 
       function checkAnswer() {
         const userAnswer = input.value.trim();
         if (!userAnswer) return;
-
-        const isCorrect = fuzzyMatch(userAnswer, word.meaning);
+        const isCorrect = fuzzyMatch(userAnswer, expectedAnswer);
         Storage.recordAnswer(word.id, isCorrect);
         Storage.updateStreak();
-
         if (isCorrect) {
-          score++;
-          streak++;
-          bestStreak = Math.max(bestStreak, streak);
+          score++; streak++; bestStreak = Math.max(bestStreak, streak);
           feedback.innerHTML = `<span class="feedback-correct">✓ Correct!</span>`;
           feedback.className = 'typing-feedback show correct';
         } else {
           streak = 0;
-          feedback.innerHTML = `<span class="feedback-wrong">✕ ${word.meaning}</span>`;
+          feedback.innerHTML = `<span class="feedback-wrong">✕ ${expectedAnswer}</span>`;
           feedback.className = 'typing-feedback show wrong';
         }
-
         input.disabled = true;
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-          currentIndex++;
-          renderPrompt();
-        }, 1500);
+        document.getElementById('typing-submit').disabled = true;
+        setTimeout(() => { currentIndex++; renderPrompt(); }, 1500);
       }
 
-      submitBtn.addEventListener('click', checkAnswer);
-      input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') checkAnswer();
-      });
-
+      document.getElementById('typing-submit').addEventListener('click', checkAnswer);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
       document.getElementById('typing-skip').addEventListener('click', () => {
         streak = 0;
         Storage.recordAnswer(word.id, false);
-        feedback.innerHTML = `<span class="feedback-skip">Skipped — ${word.meaning}</span>`;
+        feedback.innerHTML = `<span class="feedback-skip">Skipped — ${expectedAnswer}</span>`;
         feedback.className = 'typing-feedback show wrong';
-        setTimeout(() => {
-          currentIndex++;
-          renderPrompt();
-        }, 1200);
+        setTimeout(() => { currentIndex++; renderPrompt(); }, 1200);
       });
-
-      // Auto-focus input
       setTimeout(() => input.focus(), 100);
     }
 
     function renderTypingResults() {
       const pct = words.length > 0 ? Math.round((score / words.length) * 100) : 0;
       container.innerHTML = `
-        <div class="results-view">
-          <div class="results-card">
-            <h2>Practice Complete!</h2>
-            <div class="results-score">
-              <span class="results-pct">${pct}%</span>
-              <span class="results-label">${score} / ${words.length} correct</span>
-            </div>
-            <div class="results-extra">Best streak: 🔥 ${bestStreak}</div>
-            <div class="results-message">${getResultMessage(pct)}</div>
-            <div class="results-actions">
-              <button class="btn btn-primary" id="typing-restart">Practice Again</button>
-              <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
-            </div>
+        <div class="results-view"><div class="results-card">
+          <h2>Practice Complete!</h2>
+          <div class="results-score"><span class="results-pct">${pct}%</span><span class="results-label">${score} / ${words.length} correct</span></div>
+          <div class="results-extra">Best streak: 🔥 ${bestStreak}</div>
+          <div class="results-message">${getResultMessage(pct)}</div>
+          <div class="results-actions">
+            <button class="btn btn-primary" id="restart-btn">Practice Again</button>
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
           </div>
-        </div>
+        </div></div>
       `;
-      document.getElementById('typing-restart').addEventListener('click', () => renderSetup());
+      document.getElementById('restart-btn').addEventListener('click', () => renderSetup());
     }
 
     renderSetup();
@@ -945,32 +1029,31 @@ const App = (() => {
   // ═══════════════════════════════════════════════════════════
 
   function renderMatching(container) {
-    let selectedCategory = 'all';
-    let pairCount = 6;
-    let matchCards = [];
-    let flippedCards = [];
-    let matchedPairs = 0;
-    let moves = 0;
-    let timerInterval = null;
-    let seconds = 0;
-    let locked = false;
+    let state = { category: 'all', difficulty: 'all', matchType: 'jp2en', gridSize: 'medium' };
+    const GRID_SIZES = { small: { pairs: 3, cols: 3 }, medium: { pairs: 6, cols: 4 }, large: { pairs: 8, cols: 4 } };
+    let matchCards = [], flippedCards = [], matchedPairs = 0, moves = 0, timerInterval = null, seconds = 0, locked = false, pairCount = 6;
 
     function startSession() {
-      const pool = getFilteredWords(selectedCategory);
+      const gs = GRID_SIZES[state.gridSize];
+      pairCount = gs.pairs;
+      const pool = state.matchType === 'kanji2hira'
+        ? getFilteredWords(state.category, state.difficulty).filter(w => w.kanji !== w.reading)
+        : getFilteredWords(state.category, state.difficulty);
+      if (pool.length < pairCount) { container.innerHTML = emptyState('Not enough words', `Need at least ${pairCount} words. Try changing filters.`); return; }
       const pairs = shuffleArray(pool).slice(0, pairCount);
 
-      // Create card array: each pair makes 2 cards (one JP, one EN)
       matchCards = [];
       pairs.forEach((word, i) => {
-        matchCards.push({ pairId: i, type: 'jp', display: word.kanji, word, flipped: false, matched: false });
-        matchCards.push({ pairId: i, type: 'en', display: word.meaning, word, flipped: false, matched: false });
+        if (state.matchType === 'kanji2hira') {
+          matchCards.push({ pairId: i, type: 'jp', display: word.kanji, word, flipped: false, matched: false });
+          matchCards.push({ pairId: i, type: 'en', display: word.reading, word, flipped: false, matched: false });
+        } else {
+          matchCards.push({ pairId: i, type: 'jp', display: word.kanji, word, flipped: false, matched: false });
+          matchCards.push({ pairId: i, type: 'en', display: word.meaning, word, flipped: false, matched: false });
+        }
       });
       matchCards = shuffleArray(matchCards);
-      flippedCards = [];
-      matchedPairs = 0;
-      moves = 0;
-      seconds = 0;
-      locked = false;
+      flippedCards = []; matchedPairs = 0; moves = 0; seconds = 0; locked = false;
       renderBoard();
       startTimer();
     }
@@ -979,55 +1062,81 @@ const App = (() => {
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         seconds++;
-        const timerEl = document.getElementById('match-timer');
-        if (timerEl) timerEl.textContent = formatTime(seconds);
+        const el = document.getElementById('match-timer');
+        if (el) el.textContent = formatTime(seconds);
       }, 1000);
     }
 
-    function formatTime(s) {
-      const mins = Math.floor(s / 60);
-      const secs = s % 60;
-      return `${mins}:${String(secs).padStart(2, '0')}`;
-    }
+    function formatTime(s) { return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
 
     function renderSetup() {
+      const bestSmall = Storage.getBestScore('small');
+      const bestMedium = Storage.getBestScore('medium');
+      const bestLarge = Storage.getBestScore('large');
+
       container.innerHTML = `
         <div class="study-setup">
-          <div class="view-header">
-            <h1>🧩 Matching Game</h1>
-            <p class="view-subtitle">Match Japanese words to their English meanings</p>
+          <div class="view-header"><h1>🧩 Matching Game</h1><p class="view-subtitle">Match pairs by flipping cards</p></div>
+          ${renderInstructions('How to Play', [
+            'Flip two cards at a time by clicking/tapping them',
+            'If the two cards are a matching pair, they stay revealed',
+            'If they don\'t match, they flip back — remember their positions!',
+            'Match all pairs to complete the game',
+            '<strong>JP ↔ EN:</strong> Match Japanese words to English meanings',
+            '<strong>Kanji ↔ Hiragana:</strong> Match kanji to their hiragana readings',
+          ])}
+          <div class="setup-section">
+            <div class="setup-section-title"><span class="setup-section-icon">🎯</span> Match Type</div>
+            <div class="direction-selector" style="grid-template-columns: repeat(3, 1fr);">
+              <button class="direction-option ${state.matchType === 'jp2en' ? 'active' : ''}" data-matchtype="jp2en">
+                <span class="direction-option-icon">日↔英</span><span class="direction-option-label">JP ↔ EN</span>
+              </button>
+              <button class="direction-option ${state.matchType === 'kanji2hira' ? 'active' : ''}" data-matchtype="kanji2hira">
+                <span class="direction-option-icon">漢↔ひ</span><span class="direction-option-label">Kanji ↔ Hira</span>
+              </button>
+              <button class="direction-option ${state.matchType === 'mix' ? 'active' : ''}" data-matchtype="mix">
+                <span class="direction-option-icon">🔀</span><span class="direction-option-label">Random Mix</span>
+              </button>
+            </div>
           </div>
-          ${renderCategoryFilter(selectedCategory)}
-          <div class="session-selector">
-            <span class="session-label">Pairs:</span>
-            ${[4, 6, 8].map(n => `
-              <button class="session-btn ${n === pairCount ? 'active' : ''}" data-count="${n}">${n}</button>
-            `).join('')}
+          <div class="setup-section">
+            <div class="setup-section-title"><span class="setup-section-icon">📐</span> Grid Size</div>
+            <div class="grid-size-selector">
+              ${['small', 'medium', 'large'].map(size => {
+                const gs = GRID_SIZES[size];
+                const best = Storage.getBestScore(size);
+                return `
+                  <button class="grid-size-option ${state.gridSize === size ? 'active' : ''}" data-gridsize="${size}">
+                    <div class="grid-size-preview ${size}">${Array(gs.pairs * 2).fill('<span class="grid-size-dot"></span>').join('')}</div>
+                    <span class="grid-size-label">${size.charAt(0).toUpperCase() + size.slice(1)} (${gs.pairs} pairs)</span>
+                    ${best ? `<span class="best-score-badge">🏆 ${best.moves} moves</span>` : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
           </div>
-          <button class="btn btn-primary btn-lg" id="start-matching">Start Game</button>
+          ${renderCategoryFilter(state.category)}
+          ${renderDifficultyFilter(state.difficulty)}
+          <button class="btn btn-primary btn-lg" id="start-btn">Start Game</button>
         </div>
       `;
 
-      container.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          selectedCategory = chip.dataset.category;
-          renderSetup();
-        });
+      // Match type listeners
+      container.querySelectorAll('[data-matchtype]').forEach(btn => {
+        btn.addEventListener('click', () => { state.matchType = btn.dataset.matchtype; renderSetup(); });
       });
-
-      container.querySelectorAll('.session-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          pairCount = parseInt(btn.dataset.count);
-          renderSetup();
-        });
+      container.querySelectorAll('[data-gridsize]').forEach(btn => {
+        btn.addEventListener('click', () => { state.gridSize = btn.dataset.gridsize; renderSetup(); });
       });
-
-      document.getElementById('start-matching').addEventListener('click', startSession);
+      bindSetupListeners(container, state, renderSetup);
+      document.getElementById('start-btn').addEventListener('click', () => {
+        if (state.matchType === 'mix') state.matchType = Math.random() > 0.5 ? 'jp2en' : 'kanji2hira';
+        startSession();
+      });
     }
 
     function renderBoard() {
-      const cols = matchCards.length <= 8 ? 4 : matchCards.length <= 12 ? 4 : 4;
-
+      const cols = GRID_SIZES[state.gridSize].cols;
       container.innerHTML = `
         <div class="matching-view">
           <div class="matching-header">
@@ -1039,9 +1148,7 @@ const App = (() => {
             ${matchCards.map((card, i) => `
               <div class="match-card ${card.flipped ? 'flipped' : ''} ${card.matched ? 'matched' : ''}" data-index="${i}">
                 <div class="match-card-inner">
-                  <div class="match-card-front">
-                    <span class="match-card-symbol">?</span>
-                  </div>
+                  <div class="match-card-front"><span class="match-card-symbol">?</span></div>
                   <div class="match-card-back ${card.type === 'jp' ? 'match-jp' : 'match-en'}">
                     <span class="${card.type === 'jp' ? 'match-kanji' : 'match-meaning'}">${card.display}</span>
                   </div>
@@ -1055,15 +1162,13 @@ const App = (() => {
       document.getElementById('matching-grid').addEventListener('click', e => {
         const cardEl = e.target.closest('.match-card');
         if (!cardEl || locked) return;
-        const idx = parseInt(cardEl.dataset.index);
-        flipCard(idx, cardEl);
+        flipCard(parseInt(cardEl.dataset.index), cardEl);
       });
     }
 
     function flipCard(index, element) {
       const card = matchCards[index];
       if (card.flipped || card.matched) return;
-
       card.flipped = true;
       element.classList.add('flipped');
       flippedCards.push({ index, element, card });
@@ -1072,70 +1177,153 @@ const App = (() => {
         moves++;
         document.getElementById('match-moves').textContent = moves;
         locked = true;
-
         const [a, b] = flippedCards;
-
         if (a.card.pairId === b.card.pairId && a.card.type !== b.card.type) {
-          // Match!
           setTimeout(() => {
-            a.card.matched = true;
-            b.card.matched = true;
-            a.element.classList.add('matched');
-            b.element.classList.add('matched');
+            a.card.matched = true; b.card.matched = true;
+            a.element.classList.add('matched'); b.element.classList.add('matched');
             matchedPairs++;
             document.getElementById('match-pairs').textContent = `${matchedPairs}/${pairCount}`;
-
-            // Record progress
             Storage.recordAnswer(a.card.word.id, true);
             Storage.updateStreak();
-
-            flippedCards = [];
-            locked = false;
-
+            flippedCards = []; locked = false;
             if (matchedPairs === pairCount) {
               clearInterval(timerInterval);
-              setTimeout(() => renderMatchResults(), 600);
+              const isNewBest = Storage.setBestScore(state.gridSize, { moves, time: seconds });
+              setTimeout(() => renderMatchResults(isNewBest), 600);
             }
           }, 400);
         } else {
-          // No match
           setTimeout(() => {
-            a.card.flipped = false;
-            b.card.flipped = false;
-            a.element.classList.remove('flipped');
-            b.element.classList.remove('flipped');
-            flippedCards = [];
-            locked = false;
+            a.card.flipped = false; b.card.flipped = false;
+            a.element.classList.remove('flipped'); b.element.classList.remove('flipped');
+            flippedCards = []; locked = false;
           }, 800);
         }
       }
     }
 
-    function renderMatchResults() {
+    function renderMatchResults(isNewBest) {
       container.innerHTML = `
-        <div class="results-view">
-          <div class="results-card">
-            <h2>🎉 All Matched!</h2>
-            <div class="results-score">
-              <span class="results-pct">${formatTime(seconds)}</span>
-              <span class="results-label">${moves} moves</span>
-            </div>
-            <div class="results-message">${moves <= pairCount * 1.5 ? 'Outstanding memory! 🧠' : moves <= pairCount * 2 ? 'Great job! 👏' : 'Keep practicing! 💪'}</div>
-            <div class="results-actions">
-              <button class="btn btn-primary" id="match-restart">Play Again</button>
-              <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
-            </div>
+        <div class="results-view"><div class="results-card">
+          <h2>🎉 All Matched!</h2>
+          <div class="results-score">
+            <span class="results-pct">${formatTime(seconds)}</span>
+            <span class="results-label">${moves} moves</span>
+          </div>
+          ${isNewBest ? '<div class="results-extra">🏆 New Personal Best!</div>' : ''}
+          <div class="results-message">${moves <= pairCount * 1.5 ? 'Outstanding memory! 🧠' : moves <= pairCount * 2 ? 'Great job! 👏' : 'Keep practicing! 💪'}</div>
+          <div class="results-actions">
+            <button class="btn btn-primary" id="restart-btn">Play Again</button>
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
+          </div>
+        </div></div>
+      `;
+      document.getElementById('restart-btn').addEventListener('click', () => renderSetup());
+    }
+
+    currentCleanup = () => { if (timerInterval) clearInterval(timerInterval); };
+    renderSetup();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // KANJI SECTION
+  // ═══════════════════════════════════════════════════════════
+
+  function renderKanji(container) {
+    if (typeof KanjiHelper === 'undefined') {
+      container.innerHTML = emptyState('Kanji module not loaded', 'Please refresh the page.');
+      return;
+    }
+
+    const kanjiList = KanjiHelper.getKanjiList();
+    let currentDetailChar = null;
+
+    function renderBrowse() {
+      container.innerHTML = `
+        <div class="categories-view">
+          <div class="view-header">
+            <h1>漢 Kanji Study</h1>
+            <p class="view-subtitle">${KanjiHelper.getKanjiCount()} unique kanji characters from N5 vocabulary</p>
+          </div>
+          ${renderInstructions('About Kanji Study', [
+            'Browse all kanji characters found in the N5 vocabulary',
+            'Click any kanji card to see its details, readings, and example words',
+            'Use the search bar to find specific kanji by character, reading, or meaning',
+            'Kanji with more associated words appear first',
+          ])}
+          <div class="search-bar-container">
+            <input type="text" id="kanji-search" class="search-input" placeholder="Search kanji by character, reading, or meaning..." autocomplete="off" />
+          </div>
+          <div class="kanji-grid" id="kanji-grid">
+            ${kanjiList.map(k => {
+              const mastery = Storage.getKanjiMasteryLevel(k.character);
+              return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
+            }).join('')}
+          </div>
+          <div id="kanji-detail-panel" style="display:none;"></div>
+        </div>
+      `;
+
+      document.getElementById('kanji-grid').addEventListener('click', e => {
+        const card = e.target.closest('.kanji-card');
+        if (card) showKanjiDetail(card.dataset.char);
+      });
+
+      document.getElementById('kanji-search').addEventListener('input', e => {
+        const query = e.target.value.trim();
+        const results = query ? KanjiHelper.searchKanji(query) : kanjiList;
+        const grid = document.getElementById('kanji-grid');
+        grid.innerHTML = results.map(k => {
+          const mastery = Storage.getKanjiMasteryLevel(k.character);
+          return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
+        }).join('');
+      });
+    }
+
+    function showKanjiDetail(char) {
+      const detail = KanjiHelper.getKanjiDetail(char);
+      if (!detail) return;
+      currentDetailChar = char;
+
+      const grid = document.getElementById('kanji-grid');
+      const panel = document.getElementById('kanji-detail-panel');
+      grid.style.display = 'none';
+      panel.style.display = '';
+
+      const mastery = Storage.getKanjiMasteryLevel(char);
+      panel.innerHTML = `
+        <div class="kanji-detail">
+          <button class="btn btn-secondary btn-sm" id="back-to-kanji">← Back to Kanji List</button>
+          <div class="kanji-detail-char">${char}</div>
+          <span class="tag tag-${mastery}" style="display: block; text-align: center; margin-bottom: 1rem; width: fit-content; margin-left: auto; margin-right: auto;">${mastery}</span>
+
+          <div class="kanji-detail-section">
+            <div class="kanji-detail-section-title">Meanings</div>
+            <p style="font-size: 1.1rem; color: var(--text-primary);">${detail.meanings.join(', ')}</p>
+          </div>
+
+          <div class="kanji-detail-section">
+            <div class="kanji-detail-section-title">Example Words (${detail.words.length})</div>
+            ${detail.words.map(w => `
+              <div class="kanji-example-word">
+                <span class="kanji-example-kanji">${w.kanji}</span>
+                <span class="kanji-example-reading">${w.reading}</span>
+                <span class="kanji-example-meaning">${w.meaning}</span>
+              </div>
+            `).join('')}
           </div>
         </div>
       `;
-      document.getElementById('match-restart').addEventListener('click', () => renderSetup());
+
+      document.getElementById('back-to-kanji').addEventListener('click', () => {
+        panel.style.display = 'none';
+        grid.style.display = '';
+        currentDetailChar = null;
+      });
     }
 
-    currentCleanup = () => {
-      if (timerInterval) clearInterval(timerInterval);
-    };
-
-    renderSetup();
+    renderBrowse();
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -1143,47 +1331,33 @@ const App = (() => {
   // ═══════════════════════════════════════════════════════════
 
   function renderSRS(container) {
-    let dueCards = [];
-    let newCards = [];
-    let allCards = [];
-    let currentIndex = 0;
-    let isFlipped = false;
+    let dueCards = [], newCards = [], allCards = [], currentIndex = 0, isFlipped = false, actionsShown = false;
     let sessionStats = { again: 0, hard: 0, good: 0, easy: 0 };
     let keyHandler = null;
 
     function loadCards() {
       dueCards = SRS.getDueCards();
-      newCards = SRS.getNewCards(5); // Introduce 5 new words per session
+      newCards = SRS.getNewCards(5);
       newCards.forEach(w => SRS.introduceWord(w.id));
       allCards = [...dueCards, ...newCards.map(w => ({ ...w, srs: Storage.getWordSRS(w.id) }))];
       allCards = shuffleArray(allCards);
-      currentIndex = 0;
-      isFlipped = false;
+      currentIndex = 0; isFlipped = false; actionsShown = false;
       sessionStats = { again: 0, hard: 0, good: 0, easy: 0 };
     }
 
     function renderReview() {
-      if (allCards.length === 0) {
-        renderEmpty();
-        return;
-      }
-
-      if (currentIndex >= allCards.length) {
-        renderSRSResults();
-        return;
-      }
+      if (allCards.length === 0) { renderEmpty(); return; }
+      if (currentIndex >= allCards.length) { renderSRSResults(); return; }
 
       const word = allCards[currentIndex];
       const nextIntervals = SRS.getNextIntervals(word.id);
-      isFlipped = false;
+      isFlipped = false; actionsShown = false;
 
       container.innerHTML = `
         <div class="srs-view">
           <div class="srs-header">
             <div class="card-counter">${currentIndex + 1} / ${allCards.length}</div>
-            <div class="srs-box-info">
-              <span class="tag tag-srs">${SRS.getBoxName(word.srs?.box || 0)}</span>
-            </div>
+            <div class="srs-box-info"><span class="tag tag-srs">${SRS.getBoxName(word.srs?.box || 0)}</span></div>
           </div>
           <div class="flashcard-container">
             <div class="flashcard srs-card" id="srs-card">
@@ -1194,31 +1368,17 @@ const App = (() => {
               </div>
               <div class="flashcard-back">
                 <span class="flashcard-meaning">${word.meaning}</span>
-                <span class="tag tag-${word.category}">${getCategoryDisplayName(word.category)}</span>
+                <span class="tag">${getCategoryDisplayName(word.category)}</span>
               </div>
             </div>
           </div>
           <div class="srs-buttons" id="srs-buttons" style="visibility: hidden;">
-            <button class="srs-btn srs-again" data-rating="0">
-              <span class="srs-btn-label">Again</span>
-              <span class="srs-btn-interval">${nextIntervals.again}</span>
-            </button>
-            <button class="srs-btn srs-hard" data-rating="1">
-              <span class="srs-btn-label">Hard</span>
-              <span class="srs-btn-interval">${nextIntervals.hard}</span>
-            </button>
-            <button class="srs-btn srs-good" data-rating="2">
-              <span class="srs-btn-label">Good</span>
-              <span class="srs-btn-interval">${nextIntervals.good}</span>
-            </button>
-            <button class="srs-btn srs-easy" data-rating="3">
-              <span class="srs-btn-label">Easy</span>
-              <span class="srs-btn-interval">${nextIntervals.easy}</span>
-            </button>
+            <button class="srs-btn srs-again" data-rating="0"><span class="srs-btn-label">Again</span><span class="srs-btn-interval">${nextIntervals.again}</span></button>
+            <button class="srs-btn srs-hard" data-rating="1"><span class="srs-btn-label">Hard</span><span class="srs-btn-interval">${nextIntervals.hard}</span></button>
+            <button class="srs-btn srs-good" data-rating="2"><span class="srs-btn-label">Good</span><span class="srs-btn-interval">${nextIntervals.good}</span></button>
+            <button class="srs-btn srs-easy" data-rating="3"><span class="srs-btn-label">Easy</span><span class="srs-btn-interval">${nextIntervals.easy}</span></button>
           </div>
-          <div class="keyboard-hints">
-            <span>Space: Flip</span> <span>1-4: Rate</span>
-          </div>
+          <div class="keyboard-hints"><span>Space: Flip</span> <span>1-4: Rate</span></div>
         </div>
       `;
 
@@ -1226,28 +1386,21 @@ const App = (() => {
       const buttons = document.getElementById('srs-buttons');
 
       card.addEventListener('click', () => {
-        if (!isFlipped) {
-          isFlipped = true;
-          card.classList.add('flipped');
-          buttons.style.visibility = 'visible';
-        }
+        isFlipped = !isFlipped;
+        card.classList.toggle('flipped');
+        if (!actionsShown) { buttons.style.visibility = 'visible'; actionsShown = true; }
       });
 
       document.querySelectorAll('.srs-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const rating = parseInt(btn.dataset.rating);
-          rateSRS(rating);
-        });
+        btn.addEventListener('click', () => rateSRS(parseInt(btn.dataset.rating)));
       });
     }
 
     function rateSRS(rating) {
       const word = allCards[currentIndex];
       SRS.review(word.id, rating);
-
       const names = ['again', 'hard', 'good', 'easy'];
       sessionStats[names[rating]]++;
-
       currentIndex++;
       renderReview();
     }
@@ -1271,67 +1424,65 @@ const App = (() => {
     function renderSRSResults() {
       const total = sessionStats.again + sessionStats.hard + sessionStats.good + sessionStats.easy;
       const correctPct = total > 0 ? Math.round(((sessionStats.good + sessionStats.easy) / total) * 100) : 0;
-
       container.innerHTML = `
-        <div class="results-view">
-          <div class="results-card">
-            <h2>Review Complete!</h2>
-            <div class="results-score">
-              <span class="results-pct">${correctPct}%</span>
-              <span class="results-label">${total} cards reviewed</span>
-            </div>
-            <div class="srs-results-breakdown">
-              <div class="srs-result-item"><span class="dot dot-again"></span> Again: ${sessionStats.again}</div>
-              <div class="srs-result-item"><span class="dot dot-hard"></span> Hard: ${sessionStats.hard}</div>
-              <div class="srs-result-item"><span class="dot dot-good"></span> Good: ${sessionStats.good}</div>
-              <div class="srs-result-item"><span class="dot dot-easy"></span> Easy: ${sessionStats.easy}</div>
-            </div>
-            <div class="results-actions">
-              <button class="btn btn-primary" id="srs-restart">Review More</button>
-              <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
-            </div>
+        <div class="results-view"><div class="results-card">
+          <h2>Review Complete!</h2>
+          <div class="results-score"><span class="results-pct">${correctPct}%</span><span class="results-label">${total} cards reviewed</span></div>
+          <div class="srs-results-breakdown">
+            <div class="srs-result-item"><span class="dot dot-again"></span> Again: ${sessionStats.again}</div>
+            <div class="srs-result-item"><span class="dot dot-hard"></span> Hard: ${sessionStats.hard}</div>
+            <div class="srs-result-item"><span class="dot dot-good"></span> Good: ${sessionStats.good}</div>
+            <div class="srs-result-item"><span class="dot dot-easy"></span> Easy: ${sessionStats.easy}</div>
           </div>
-        </div>
+          <div class="results-actions">
+            <button class="btn btn-primary" id="srs-restart">Review More</button>
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
+          </div>
+        </div></div>
       `;
-      document.getElementById('srs-restart').addEventListener('click', () => {
-        loadCards();
-        renderReview();
-      });
+      document.getElementById('srs-restart').addEventListener('click', () => { loadCards(); renderReview(); });
     }
 
-    // Keyboard handler
     keyHandler = (e) => {
       if (currentView !== 'srs') return;
       if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         const card = document.getElementById('srs-card');
-        if (card && !isFlipped) {
-          isFlipped = true;
-          card.classList.add('flipped');
-          const btns = document.getElementById('srs-buttons');
-          if (btns) btns.style.visibility = 'visible';
+        if (card) {
+          isFlipped = !isFlipped;
+          card.classList.toggle('flipped');
+          if (!actionsShown) {
+            const btns = document.getElementById('srs-buttons');
+            if (btns) btns.style.visibility = 'visible';
+            actionsShown = true;
+          }
         }
-      } else if (isFlipped && e.key >= '1' && e.key <= '4') {
+      } else if (actionsShown && e.key >= '1' && e.key <= '4') {
         rateSRS(parseInt(e.key) - 1);
       }
     };
     document.addEventListener('keydown', keyHandler);
-    currentCleanup = () => {
-      document.removeEventListener('keydown', keyHandler);
-    };
+    currentCleanup = () => document.removeEventListener('keydown', keyHandler);
 
     loadCards();
     renderReview();
   }
 
-  // ─── Result Messages ──────────────────────────────────────
+  // ─── Empty State Helper ────────────────────────────────────
 
-  function getResultMessage(pct) {
-    if (pct >= 95) return '🌸 Perfect! You\'re a master! 🌸';
-    if (pct >= 80) return '🎯 Excellent work! Keep it up!';
-    if (pct >= 60) return '👍 Good progress! Keep studying!';
-    if (pct >= 40) return '💪 Getting there! Practice makes perfect!';
-    return '📚 Keep studying! You\'ll improve!';
+  function emptyState(title, desc) {
+    return `
+      <div class="srs-view">
+        <div class="empty-state">
+          <span class="empty-emoji">😅</span>
+          <h2>${title}</h2>
+          <p>${desc}</p>
+          <div class="results-actions">
+            <a href="#/dashboard" class="btn btn-secondary">Dashboard</a>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // ─── Mobile Navigation ────────────────────────────────────
@@ -1344,9 +1495,8 @@ const App = (() => {
         navLinks.classList.toggle('open');
         toggle.classList.toggle('open');
       });
-      // Close nav on link click (mobile)
       navLinks.addEventListener('click', (e) => {
-        if (e.target.classList.contains('nav-link')) {
+        if (e.target.closest('.nav-link')) {
           navLinks.classList.remove('open');
           toggle.classList.remove('open');
         }

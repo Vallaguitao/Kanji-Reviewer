@@ -252,6 +252,80 @@ const Storage = (() => {
     _set('settings', { ...current, ...newSettings });
   }
 
+  // ─── Last Mode / Continue ─────────────────────────────────
+
+  function getLastMode() {
+    return _get('lastMode', null);
+  }
+
+  function setLastMode(mode) {
+    _set('lastMode', mode);
+  }
+
+  // ─── Mode Usage (for dashboard ordering) ──────────────────
+
+  function getModeUsage() {
+    return _get('modeUsage', {});
+  }
+
+  function incrementModeUsage(mode) {
+    const usage = getModeUsage();
+    usage[mode] = (usage[mode] || 0) + 1;
+    _set('modeUsage', usage);
+  }
+
+  // ─── Best Scores (matching game) ──────────────────────────
+
+  function getBestScore(gridSize) {
+    const scores = _get('bestScores', {});
+    return scores[gridSize] || null;
+  }
+
+  function setBestScore(gridSize, score) {
+    const scores = _get('bestScores', {});
+    const existing = scores[gridSize];
+    // Only update if better (fewer moves or same moves but faster time)
+    if (!existing || score.moves < existing.moves || (score.moves === existing.moves && score.time < existing.time)) {
+      scores[gridSize] = score;
+      _set('bestScores', scores);
+      return true; // New best!
+    }
+    return false;
+  }
+
+  // ─── Kanji Progress ───────────────────────────────────────
+
+  function getKanjiProgress(char) {
+    const data = _get('kanjiProgress', {});
+    return data[char] || { correct: 0, incorrect: 0, lastReviewed: null };
+  }
+
+  function updateKanjiProgress(char, isCorrect) {
+    const data = _get('kanjiProgress', {});
+    if (!data[char]) {
+      data[char] = { correct: 0, incorrect: 0, lastReviewed: null };
+    }
+    if (isCorrect) {
+      data[char].correct++;
+    } else {
+      data[char].incorrect++;
+    }
+    data[char].lastReviewed = Date.now();
+    _set('kanjiProgress', data);
+    return data[char];
+  }
+
+  function getKanjiMasteryLevel(char) {
+    const stat = getKanjiProgress(char);
+    const total = stat.correct + stat.incorrect;
+    if (total === 0) return 'new';
+    const accuracy = stat.correct / total;
+    if (stat.correct >= 5 && accuracy >= 0.9) return 'mastered';
+    if (stat.correct >= 3 && accuracy >= 0.7) return 'reviewing';
+    if (stat.correct >= 1) return 'learning';
+    return 'new';
+  }
+
   // ─── Reset ─────────────────────────────────────────────────
 
   function resetAllData() {
@@ -294,7 +368,25 @@ const Storage = (() => {
     getSettings,
     updateSettings,
 
+    // Last Mode / Continue
+    getLastMode,
+    setLastMode,
+
+    // Mode Usage
+    getModeUsage,
+    incrementModeUsage,
+
+    // Best Scores
+    getBestScore,
+    setBestScore,
+
+    // Kanji Progress
+    getKanjiProgress,
+    updateKanjiProgress,
+    getKanjiMasteryLevel,
+
     // Reset
     resetAllData,
   };
 })();
+
