@@ -69,6 +69,29 @@
   --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Light Theme Overrides */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: hsl(235, 15%, 98%);
+  --bg-secondary: hsl(235, 15%, 95%);
+  --bg-tertiary: hsl(235, 15%, 90%);
+  --bg-hover: hsl(235, 15%, 85%);
+  
+  /* Text */
+  --text-primary: hsl(235, 15%, 15%);
+  --text-secondary: hsl(235, 10%, 40%);
+  --text-kanji: hsl(0, 0%, 10%);
+  
+  /* Glassmorphism */
+  --glass-bg: hsla(235, 15%, 95%, 0.65);
+  --glass-border: hsla(235, 20%, 70%, 0.25);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px hsla(235, 20%, 5%, 0.1);
+  --shadow-md: 0 4px 20px hsla(235, 20%, 5%, 0.15);
+  --shadow-lg: 0 8px 40px hsla(235, 20%, 5%, 0.2);
+}
+
 
 /* ─── CSS Reset / Normalize ────────────────────────────────── */
 *,
@@ -246,6 +269,53 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link.active {
   color: var(--accent-sakura);
   background: hsla(340, 80%, 65%, 0.08);
+}
+
+/* Nav Badge (for SRS due count) */
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent-error);
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+}
+
+/* Nav Actions */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-left: auto;
+}
+
+.nav-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.nav-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-action-icon {
+  font-size: 1.2rem;
 }
 
 /* ─── View Container ───────────────────────────────────────── */
@@ -1428,7 +1498,9 @@ h1, h2, h3, h4, h5, h6 {
 .modal-content {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
   background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
@@ -1437,12 +1509,50 @@ h1, h2, h3, h4, h5, h6 {
   animation: scaleIn 0.3s ease both;
 }
 
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
 .modal-title {
   font-family: var(--font-heading);
   font-size: 1.3rem;
   font-weight: 700;
   color: var(--text-kanji);
-  margin-bottom: var(--space-md);
+  margin: 0;
 }
 
 .modal-body {
@@ -1456,6 +1566,48 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-sm);
+}
+
+/* Keyboard Shortcuts Grid */
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+}
+
+.shortcut-group h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-sakura);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: var(--space-xs) 0;
+}
+
+.shortcut-item kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 0 var(--bg-hover);
 }
 
 /* ─── Toast Notification ───────────────────────────────────── */

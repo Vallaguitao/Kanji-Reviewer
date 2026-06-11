@@ -54,10 +54,174 @@ const App = (() => {
   // ─── Router ────────────────────────────────────────────────
 
   function init() {
+    // Initialize modules
+    if (typeof Theme !== 'undefined') Theme.init();
+    if (typeof Speech !== 'undefined') Speech.init();
     if (typeof KanjiHelper !== 'undefined') KanjiHelper.init();
+    
+    // Setup global keyboard shortcuts
+    setupGlobalShortcuts();
+    
+    // Setup nav action buttons
+    setupNavActions();
+    
+    // Update SRS badge
+    updateSRSBadge();
+    
+    // Start route handling
     window.addEventListener('hashchange', handleRoute);
     handleRoute();
     Storage.updateStreak();
+  }
+  
+  function setupNavActions() {
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        Theme.toggle();
+      });
+    }
+    
+    // Help toggle
+    const helpToggle = document.getElementById('help-toggle');
+    if (helpToggle) {
+      helpToggle.addEventListener('click', showKeyboardHelp);
+    }
+  }
+  
+  function setupGlobalShortcuts() {
+    let keyBuffer = '';
+    let keyTimeout = null;
+    
+    document.addEventListener('keydown', (e) => {
+      // Ignore if typing in input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      // Theme toggle: T
+      if (e.key.toLowerCase() === 't' && !e.ctrlKey && !e.metaKey) {
+        Theme.toggle();
+        return;
+      }
+      
+      // Help: ?
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        showKeyboardHelp();
+        return;
+      }
+      
+      // Go to routes: g + key
+      if (e.key.toLowerCase() === 'g') {
+        keyBuffer = 'g';
+        clearTimeout(keyTimeout);
+        keyTimeout = setTimeout(() => { keyBuffer = ''; }, 1000);
+        return;
+      }
+      
+      if (keyBuffer === 'g') {
+        switch (e.key.toLowerCase()) {
+          case 'd': navigate('dashboard'); break;
+          case 'f': navigate('flashcards'); break;
+          case 'q': navigate('quiz'); break;
+          case 't': navigate('typing'); break;
+          case 'm': navigate('matching'); break;
+          case 's': navigate('srs'); break;
+          case 'k': navigate('kanji'); break;
+        }
+        keyBuffer = '';
+        clearTimeout(keyTimeout);
+      }
+    });
+  }
+  
+  function showKeyboardHelp() {
+    const helpHtml = `
+      <div class="modal-overlay" id="help-modal-overlay">
+        <div class="modal" role="dialog" aria-labelledby="help-modal-title" aria-modal="true">
+          <div class="modal-header">
+            <h2 id="help-modal-title" class="modal-title">⌨️ Keyboard Shortcuts</h2>
+            <button class="modal-close" onclick="document.getElementById('help-modal-overlay').remove()" aria-label="Close">&times;</button>
+          </div>
+          <div class="modal-content">
+            <div class="shortcuts-grid">
+              <div class="shortcut-group">
+                <h3>Navigation</h3>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>D</kbd> Dashboard</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>F</kbd> Flashcards</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>Q</kbd> Quiz</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>T</kbd> Typing</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>M</kbd> Matching</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>S</kbd> SRS Review</div>
+                <div class="shortcut-item"><kbd>G</kbd> + <kbd>K</kbd> Kanji</div>
+              </div>
+              <div class="shortcut-group">
+                <h3>General</h3>
+                <div class="shortcut-item"><kbd>T</kbd> Toggle Theme</div>
+                <div class="shortcut-item"><kbd>?</kbd> Show This Help</div>
+              </div>
+              <div class="shortcut-group">
+                <h3>Flashcards/SRS</h3>
+                <div class="shortcut-item"><kbd>Space</kbd> Flip Card</div>
+                <div class="shortcut-item"><kbd>Enter</kbd> Next Card</div>
+                <div class="shortcut-item"><kbd>1</kbd> Again</div>
+                <div class="shortcut-item"><kbd>2</kbd> Hard</div>
+                <div class="shortcut-item"><kbd>3</kbd> Good</div>
+                <div class="shortcut-item"><kbd>4</kbd> Easy</div>
+              </div>
+              <div class="shortcut-group">
+                <h3>Quiz</h3>
+                <div class="shortcut-item"><kbd>1-4</kbd> Select Option</div>
+              </div>
+              <div class="shortcut-group">
+                <h3>Typing</h3>
+                <div class="shortcut-item"><kbd>Enter</kbd> Submit Answer</div>
+                <div class="shortcut-item"><kbd>Esc</kbd> Skip</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" onclick="document.getElementById('help-modal-overlay').remove()">Got it!</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Remove existing modal if any
+    const existing = document.getElementById('help-modal-overlay');
+    if (existing) existing.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', helpHtml);
+    
+    // Focus trap and close on overlay click
+    setTimeout(() => {
+      const overlay = document.getElementById('help-modal-overlay');
+      const modal = overlay.querySelector('.modal');
+      if (overlay && modal) {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) overlay.remove();
+        });
+        Utils.setFocusTrap(modal);
+      }
+    }, 10);
+  }
+  
+  function updateSRSBadge() {
+    const badge = document.getElementById('nav-srs-badge');
+    if (!badge) return;
+    
+    if (typeof SRS !== 'undefined') {
+      const stats = SRS.getStats();
+      if (stats.dueCount > 0) {
+        badge.textContent = stats.dueCount > 99 ? '99+' : stats.dueCount;
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    
+    // Update periodically
+    setTimeout(updateSRSBadge, 60000);
   }
 
   function handleRoute() {
