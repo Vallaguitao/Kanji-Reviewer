@@ -704,6 +704,33 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.6;
 }
 
+/* ─── Speaker Button ───────────────────────────────────────── */
+.speaker-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  color: var(--accent-sakura);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-top: var(--space-sm);
+}
+
+.speaker-btn:hover {
+  background: var(--accent-sakura);
+  color: white;
+  transform: scale(1.1);
+}
+
+.speaker-btn:active {
+  transform: scale(0.95);
+}
+
 /* ─── Flashcard Actions ────────────────────────────────────── */
 .flashcard-actions {
   display: flex;
@@ -1488,7 +1515,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .modal-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: hsla(235, 30%, 4%, 0.75);
   backdrop-filter: blur(8px);
