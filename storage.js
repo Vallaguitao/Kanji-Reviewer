@@ -342,6 +342,10 @@ const Storage = (() => {
   // ─── Public API ────────────────────────────────────────────
 
   return {
+    // Internal helpers (for export-import)
+    _get,
+    _set,
+    
     // Word Progress
     getWordProgress,
     getWordStat,

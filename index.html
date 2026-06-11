@@ -33,38 +33,49 @@
       </button>
 
       <div class="nav-links" id="nav-links">
-        <a href="#/dashboard" class="nav-link active" id="nav-dashboard">
-          <span class="nav-icon">📊</span>
+        <a href="#/dashboard" class="nav-link active" id="nav-dashboard" aria-label="Dashboard">
+          <span class="nav-icon" aria-hidden="true">📊</span>
           <span class="nav-text">Dashboard</span>
         </a>
-        <a href="#/flashcards" class="nav-link" id="nav-flashcards">
-          <span class="nav-icon">🃏</span>
+        <a href="#/flashcards" class="nav-link" id="nav-flashcards" aria-label="Flashcards">
+          <span class="nav-icon" aria-hidden="true">🃏</span>
           <span class="nav-text">Flashcards</span>
         </a>
-        <a href="#/quiz" class="nav-link" id="nav-quiz">
-          <span class="nav-icon">📝</span>
+        <a href="#/quiz" class="nav-link" id="nav-quiz" aria-label="Quiz">
+          <span class="nav-icon" aria-hidden="true">📝</span>
           <span class="nav-text">Quiz</span>
         </a>
-        <a href="#/typing" class="nav-link" id="nav-typing">
-          <span class="nav-icon">⌨️</span>
+        <a href="#/typing" class="nav-link" id="nav-typing" aria-label="Typing Practice">
+          <span class="nav-icon" aria-hidden="true">⌨️</span>
           <span class="nav-text">Typing</span>
         </a>
-        <a href="#/matching" class="nav-link" id="nav-matching">
-          <span class="nav-icon">🧩</span>
+        <a href="#/matching" class="nav-link" id="nav-matching" aria-label="Matching Game">
+          <span class="nav-icon" aria-hidden="true">🧩</span>
           <span class="nav-text">Matching</span>
         </a>
-        <a href="#/kanji" class="nav-link" id="nav-kanji">
-          <span class="nav-icon">漢</span>
+        <a href="#/kanji" class="nav-link" id="nav-kanji" aria-label="Kanji Study">
+          <span class="nav-icon" aria-hidden="true">漢</span>
           <span class="nav-text">Kanji</span>
         </a>
-        <a href="#/srs" class="nav-link" id="nav-srs">
-          <span class="nav-icon">🧠</span>
+        <a href="#/srs" class="nav-link" id="nav-srs" aria-label="Spaced Repetition Review">
+          <span class="nav-icon" aria-hidden="true">🧠</span>
           <span class="nav-text">SRS</span>
+          <span class="nav-badge" id="nav-srs-badge" aria-label="Reviews due"></span>
         </a>
-        <a href="#/categories" class="nav-link" id="nav-categories">
-          <span class="nav-icon">📂</span>
+        <a href="#/categories" class="nav-link" id="nav-categories" aria-label="Browse Categories">
+          <span class="nav-icon" aria-hidden="true">📂</span>
           <span class="nav-text">Browse</span>
         </a>
+      </div>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <button class="nav-action-btn" id="theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme (T)">
+          <span class="nav-action-icon">🌓</span>
+        </button>
+        <button class="nav-action-btn" id="help-toggle" aria-label="Keyboard shortcuts help" title="Help (?)">
+          <span class="nav-action-icon">❓</span>
+        </button>
       </div>
     </nav>
 
@@ -80,10 +91,15 @@
   </div>
 
   <!-- Scripts (loaded in dependency order) -->
+  <script src="config.js"></script>
+  <script src="utils.js"></script>
+  <script src="theme.js"></script>
+  <script src="speech.js"></script>
   <script src="vocabulary.js"></script>
   <script src="storage.js"></script>
   <script src="srs.js"></script>
   <script src="kanji.js"></script>
+  <script src="export-import.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
