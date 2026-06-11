@@ -88,6 +88,12 @@ const App = (() => {
     if (helpToggle) {
       helpToggle.addEventListener('click', showKeyboardHelp);
     }
+
+    // Settings toggle
+    const settingsToggle = document.getElementById('settings-toggle');
+    if (settingsToggle) {
+      settingsToggle.addEventListener('click', showSettings);
+    }
   }
   
   function setupGlobalShortcuts() {
@@ -222,7 +228,63 @@ const App = (() => {
       }
     }, 10);
   }
-  
+
+  function showSettings() {
+    const settingsHtml = `
+      <div class="modal-overlay" id="settings-modal-overlay">
+        <div class="modal" role="dialog" aria-labelledby="settings-modal-title" aria-modal="true">
+          <div class="modal-header">
+            <h2 id="settings-modal-title" class="modal-title">⚙️ Settings</h2>
+            <button class="modal-close" id="settings-modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <div class="modal-content">
+            <div class="danger-zone">
+              <p>Reset all progress, streaks, and study data. This action cannot be undone.</p>
+              <button class="btn btn-danger btn-sm" id="settings-reset-btn">🗑️ Reset All Progress</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if any
+    const existing = document.getElementById('settings-modal-overlay');
+    if (existing) existing.remove();
+
+    document.body.insertAdjacentHTML('beforeend', settingsHtml);
+
+    setTimeout(() => {
+      const overlay = document.getElementById('settings-modal-overlay');
+      const modal = overlay.querySelector('.modal');
+      const closeBtn = document.getElementById('settings-modal-close-btn');
+      const resetBtn = document.getElementById('settings-reset-btn');
+
+      if (overlay && modal) {
+        modal.classList.add('active');
+
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) overlay.remove();
+        });
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => overlay.remove());
+        }
+
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            if (confirm('⚠️ Are you sure? This will erase ALL your progress, streaks, and study data. This cannot be undone.')) {
+              Storage.resetAllData();
+              overlay.remove();
+              handleRoute();
+            }
+          });
+        }
+
+        Utils.setFocusTrap(modal);
+      }
+    }, 10);
+  }
+
   function updateSRSBadge() {
     const badge = document.getElementById('nav-srs-badge');
     if (!badge) return;
@@ -588,26 +650,6 @@ const App = (() => {
 
         ${kotdHtml}
 
-        <!-- Quick Stats Bar -->
-        <div class="quick-stats-bar">
-          <div class="quick-stat">
-            <span class="quick-stat-value">${progress.total}</span>
-            <span class="quick-stat-label">Total Words</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value accent">${progress.mastered + progress.reviewing + progress.learning}</span>
-            <span class="quick-stat-label">Learned</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value wisteria">${srsStats.dueCount}</span>
-            <span class="quick-stat-label">Due Review</span>
-          </div>
-          <div class="quick-stat">
-            <span class="quick-stat-value gold">${todayStats.reviewed}/20</span>
-            <span class="quick-stat-label">Today's Goal</span>
-          </div>
-        </div>
-
         <!-- Tip Banner -->
         <div class="tip-banner">
           <span class="tip-banner-icon">📌</span>
@@ -667,7 +709,7 @@ const App = (() => {
             <div class="srs-status">
               ${srsStats.dueCount > 0 ? `
                 <div class="srs-due-badge"><span class="srs-due-num">${srsStats.dueCount}</span><span class="srs-due-label">cards due for review</span></div>
-                <a href="#/srs" class="btn btn-primary btn-sm">Review Now</a>
+                <a href="#/srs" class="btn btn-secondary btn-sm">Review Now</a>
               ` : `
                 <div class="srs-caught-up"><span class="srs-emoji">🎉</span><span>You're all caught up!</span></div>
               `}
@@ -710,15 +752,6 @@ const App = (() => {
             }).join('')}
           </div>
         ` : ''}
-
-        <!-- Settings / Reset -->
-        <div class="settings-section">
-          <h3 class="settings-title">⚙️ Settings</h3>
-          <div class="danger-zone">
-            <p>Reset all progress, streaks, and study data. This action cannot be undone.</p>
-            <button class="btn btn-danger btn-sm" id="reset-btn">🗑️ Reset All Progress</button>
-          </div>
-        </div>
       </div>
     `;
 
@@ -729,14 +762,6 @@ const App = (() => {
         window.location.hash = '#/kanji';
       });
     }
-
-    // Reset handler
-    document.getElementById('reset-btn')?.addEventListener('click', () => {
-      if (confirm('⚠️ Are you sure? This will erase ALL your progress, streaks, and study data. This cannot be undone.')) {
-        Storage.resetAllData();
-        renderDashboard(container);
-      }
-    });
   }
 
   // ═══════════════════════════════════════════════════════════

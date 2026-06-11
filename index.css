@@ -187,6 +187,38 @@ h1, h2, h3, h4, h5, h6 {
   scrollbar-color: hsla(235, 30%, 35%, 0.5) var(--bg-primary);
 }
 
+/* ─── Accessibility: Focus Visibility ──────────────────────── */
+/* A consistent keyboard focus ring for every interactive element.
+   Mouse clicks won't show it (":focus-visible"), so it stays unobtrusive. */
+:focus-visible {
+  outline: 2px solid var(--accent-sakura);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ─── Accessibility: Reduced Motion ────────────────────────── */
+/* Respect users who ask for less motion: neutralize the looping/ambient
+   animations (sakura fall, floating kanji, pulse, glow, float) and snap
+   transitions, while leaving layout intact. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .sakura-container,
+  .hero-kanji-bg {
+    display: none !important;
+  }
+}
+
 
 /* ============================================================
    LAYOUT
@@ -511,92 +543,8 @@ h1, h2, h3, h4, h5, h6 {
   animation: pulse 1.5s ease infinite;
 }
 
-/* ─── Mode Card (Study Mode Launcher) ──────────────────────── */
-.mode-card {
-  position: relative;
-  background: var(--bg-secondary);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform var(--transition-spring), box-shadow var(--transition-base), border-color var(--transition-base);
-}
-
-.mode-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-lg);
-  padding: 1px;
-  background: linear-gradient(135deg, transparent 40%, var(--accent-sakura-glow));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity var(--transition-base);
-}
-
-.mode-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--accent-sakura-soft);
-}
-
-.mode-card:hover::after {
-  opacity: 1;
-}
-
-.mode-card-icon {
-  font-size: 2rem;
-  margin-bottom: var(--space-md);
-}
-
-.mode-card-title {
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-kanji);
-  margin-bottom: var(--space-xs);
-}
-
-.mode-card-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-/* ─── Category Progress ────────────────────────────────────── */
-.category-progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.category-progress-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.category-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.category-progress-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.category-progress-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
+/* Mode Card and Category Progress styles are defined later in the
+   app-specific section (see .mode-card / .category-progress-list). */
 
 
 /* ============================================================
@@ -1159,55 +1107,8 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
 }
 
-.srs-btn.again {
-  background: hsla(0, 70%, 55%, 0.15);
-  color: var(--accent-error);
-  border-color: hsla(0, 70%, 55%, 0.3);
-}
-
-.srs-btn.again:hover {
-  background: hsla(0, 70%, 55%, 0.25);
-  box-shadow: var(--shadow-glow-error);
-}
-
-.srs-btn.hard {
-  background: hsla(30, 80%, 50%, 0.12);
-  color: hsl(30, 80%, 55%);
-  border-color: hsla(30, 80%, 50%, 0.25);
-}
-
-.srs-btn.hard:hover {
-  background: hsla(30, 80%, 50%, 0.22);
-}
-
-.srs-btn.good {
-  background: hsla(150, 70%, 45%, 0.12);
-  color: var(--accent-success);
-  border-color: hsla(150, 70%, 45%, 0.25);
-}
-
-.srs-btn.good:hover {
-  background: hsla(150, 70%, 45%, 0.22);
-  box-shadow: var(--shadow-glow-success);
-}
-
-.srs-btn.easy {
-  background: hsla(210, 80%, 55%, 0.12);
-  color: hsl(210, 80%, 60%);
-  border-color: hsla(210, 80%, 55%, 0.25);
-}
-
-.srs-btn.easy:hover {
-  background: hsla(210, 80%, 55%, 0.22);
-}
-
-.srs-btn-interval {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 400;
-  opacity: 0.7;
-  margin-top: 2px;
-}
+/* SRS rating button colors (.srs-again / .srs-hard / .srs-good / .srs-easy)
+   and .srs-btn-interval are defined in the app-specific section below. */
 
 /* ─── SRS Info ─────────────────────────────────────────────── */
 .srs-info {
@@ -1729,55 +1630,12 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--glass-border);
 }
 
-.session-option {
-  padding: var(--space-sm) var(--space-md);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: transparent;
-  transition: background var(--transition-base), color var(--transition-base);
-  cursor: pointer;
-}
-
-.session-option:hover {
-  color: var(--text-primary);
-}
-
-.session-option.active {
-  background: var(--accent-sakura);
-  color: white;
-}
-
 /* ─── Category Filter ──────────────────────────────────────── */
 .category-filter {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
   margin-bottom: var(--space-lg);
-}
-
-.category-chip {
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border: 1px solid var(--glass-border);
-  cursor: pointer;
-  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
-}
-
-.category-chip:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-sakura-soft);
-}
-
-.category-chip.active {
-  background: hsla(340, 80%, 65%, 0.15);
-  color: var(--accent-sakura);
-  border-color: var(--accent-sakura);
 }
 
 
@@ -3795,53 +3653,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* ─── Quick Stats Bar ─────────────────────────────────────── */
-.quick-stats-bar {
-  display: flex;
-  justify-content: space-around;
-  background: var(--bg-secondary);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-xl);
-  gap: var(--space-md);
-  flex-wrap: wrap;
-}
-
-.quick-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.quick-stat-value {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--text-kanji);
-}
-
-.quick-stat-label {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.quick-stat-value.accent {
-  color: var(--accent-sakura);
-}
-
-.quick-stat-value.gold {
-  color: var(--accent-gold);
-}
-
-.quick-stat-value.wisteria {
-  color: var(--accent-wisteria);
-}
-
-
 /* ─── Tip Banner ──────────────────────────────────────────── */
 .tip-banner {
   display: flex;
@@ -4056,21 +3867,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-/* ─── Reset / Settings Section ────────────────────────────── */
-.settings-section {
-  margin-top: var(--space-2xl);
-  padding-top: var(--space-xl);
-  border-top: 1px solid var(--glass-border);
-}
-
-.settings-title {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-}
-
+/* ─── Danger Zone (shown inside the Settings modal) ───────── */
 .danger-zone {
   background: hsla(0, 70%, 55%, 0.06);
   border: 1px solid hsla(0, 70%, 55%, 0.15);
@@ -4133,12 +3930,6 @@ h1, h2, h3, h4, h5, h6 {
     flex-wrap: wrap;
   }
 
-  .quick-stats-bar {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    justify-items: center;
-  }
-
   .kanji-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   }
@@ -4175,10 +3966,6 @@ h1, h2, h3, h4, h5, h6 {
   .grid-size-option {
     width: 100%;
     max-width: 200px;
-  }
-
-  .quick-stats-bar {
-    grid-template-columns: 1fr;
   }
 }
 
