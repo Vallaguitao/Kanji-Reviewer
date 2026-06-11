@@ -141,7 +141,7 @@ const App = (() => {
         <div class="modal" role="dialog" aria-labelledby="help-modal-title" aria-modal="true">
           <div class="modal-header">
             <h2 id="help-modal-title" class="modal-title">⌨️ Keyboard Shortcuts</h2>
-            <button class="modal-close" onclick="document.getElementById('help-modal-overlay').remove()" aria-label="Close">&times;</button>
+            <button class="modal-close" id="help-modal-close-btn" aria-label="Close">&times;</button>
           </div>
           <div class="modal-content">
             <div class="shortcuts-grid">
@@ -181,7 +181,7 @@ const App = (() => {
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-primary" onclick="document.getElementById('help-modal-overlay').remove()">Got it!</button>
+            <button class="btn btn-primary" id="help-modal-got-it-btn">Got it!</button>
           </div>
         </div>
       </div>
@@ -197,10 +197,27 @@ const App = (() => {
     setTimeout(() => {
       const overlay = document.getElementById('help-modal-overlay');
       const modal = overlay.querySelector('.modal');
+      const closeBtn = document.getElementById('help-modal-close-btn');
+      const gotItBtn = document.getElementById('help-modal-got-it-btn');
+      
       if (overlay && modal) {
+        // Add active class to make modal visible
+        modal.classList.add('active');
+        
         overlay.addEventListener('click', (e) => {
           if (e.target === overlay) overlay.remove();
         });
+        
+        // Close button handler
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => overlay.remove());
+        }
+        
+        // Got it button handler
+        if (gotItBtn) {
+          gotItBtn.addEventListener('click', () => overlay.remove());
+        }
+        
         Utils.setFocusTrap(modal);
       }
     }, 10);
@@ -862,6 +879,7 @@ const App = (() => {
               <div class="flashcard-front">
                 <span class="flashcard-reading">${word.kanji !== word.reading ? word.reading : ''}</span>
                 <span class="flashcard-kanji">${word.kanji}</span>
+                <button class="speaker-btn" id="flashcard-speak-btn" aria-label="Play pronunciation" title="Play pronunciation">🔊</button>
                 <span class="flashcard-hint">Tap to flip</span>
               </div>
               <div class="flashcard-back">
@@ -880,6 +898,15 @@ const App = (() => {
 
       const flashcard = document.getElementById('flashcard');
       const actions = document.getElementById('flashcard-actions');
+      const speakBtn = document.getElementById('flashcard-speak-btn');
+
+      // Speaker button - play pronunciation
+      if (speakBtn && typeof Speech !== 'undefined') {
+        speakBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Speech.speakWord(word.kanji, word.reading);
+        });
+      }
 
       flashcard.addEventListener('click', () => {
         isFlipped = !isFlipped;
@@ -1675,6 +1702,7 @@ const App = (() => {
               <div class="flashcard-front">
                 <span class="flashcard-reading">${word.kanji !== word.reading ? word.reading : ''}</span>
                 <span class="flashcard-kanji">${word.kanji}</span>
+                <button class="speaker-btn" id="srs-speak-btn" aria-label="Play pronunciation" title="Play pronunciation">🔊</button>
                 <span class="flashcard-hint">Tap to reveal</span>
               </div>
               <div class="flashcard-back">
@@ -1695,6 +1723,15 @@ const App = (() => {
 
       const card = document.getElementById('srs-card');
       const buttons = document.getElementById('srs-buttons');
+      const speakBtn = document.getElementById('srs-speak-btn');
+
+      // Speaker button - play pronunciation
+      if (speakBtn && typeof Speech !== 'undefined') {
+        speakBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Speech.speakWord(word.kanji, word.reading);
+        });
+      }
 
       card.addEventListener('click', () => {
         isFlipped = !isFlipped;
