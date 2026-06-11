@@ -286,6 +286,31 @@ const KanjiHelper = (() => {
     });
   }
 
+  /**
+   * Returns a list of kanji that appear in vocabulary words of the given category.
+   * @param {string} categoryId - The category ID to filter by.
+   * @returns {Array<Object>}
+   */
+  function getKanjiByCategory(categoryId) {
+    if (!categoryId || categoryId === 'all') return kanjiList;
+    return kanjiList.filter(k => k.words.some(w => w.category === categoryId));
+  }
+
+  /**
+   * Returns a map of category ID to the count of kanji in that category.
+   * @returns {Object}
+   */
+  function getKanjiCategories() {
+    const counts = {};
+    for (const k of kanjiList) {
+      const cats = new Set(k.words.map(w => w.category));
+      for (const c of cats) {
+        counts[c] = (counts[c] || 0) + 1;
+      }
+    }
+    return counts;
+  }
+
   // ─── Public API ─────────────────────────────────────────────
 
   return {
@@ -295,5 +320,7 @@ const KanjiHelper = (() => {
     getKanjiCount,
     getKanjiQuizPool,
     searchKanji,
+    getKanjiByCategory,
+    getKanjiCategories,
   };
 })();

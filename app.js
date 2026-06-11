@@ -39,6 +39,18 @@ const App = (() => {
     "💡 Mix up your study modes to stay engaged",
   ];
 
+  const HERO_PHRASES = [
+    '一日一歩 — One step each day',
+    '継続は力なり — Persistence is power',
+    '七転び八起き — Fall seven times, rise eight',
+    '石の上にも三年 — Perseverance prevails',
+    '千里の道も一歩から — A journey of 1000 miles begins with a single step',
+    '学問に王道なし — There is no royal road to learning',
+    '塵も積もれば山となる — Even dust piled up becomes a mountain',
+  ];
+
+  let pendingKotdChar = null;
+
   // ─── Router ────────────────────────────────────────────────
 
   function init() {
@@ -318,6 +330,37 @@ const App = (() => {
     const offset = circumference - (learnedPct / 100) * circumference;
 
     const tip = TIPS[Math.floor((Date.now() / 86400000) % TIPS.length)];
+    const heroPhrase = HERO_PHRASES[Math.floor((Date.now() / 86400000) % HERO_PHRASES.length)];
+
+    // Kanji of the Day
+    let kotdHtml = '';
+    const kotdKanjiList = (typeof KanjiHelper !== 'undefined') ? KanjiHelper.getKanjiList() : [];
+    let kotdChar = null;
+    if (kotdKanjiList.length > 0) {
+      const dayIndex = Math.floor(Date.now() / 86400000) % kotdKanjiList.length;
+      const kotd = kotdKanjiList[dayIndex];
+      kotdChar = kotd.character;
+      const kotdMeanings = kotd.meanings.slice(0, 3).join('; ');
+      const kotdReadings = kotd.readings.slice(0, 3).join(', ');
+      const kotdExamples = kotd.words.slice(0, 3).map(w =>
+        `<span class="kotd-example">${w.kanji} (${w.reading}) — ${w.meaning}</span>`
+      ).join('');
+      kotdHtml = `
+        <div class="kotd-card" id="kotd-card" title="Click to study this kanji">
+          <div class="kotd-header">📅 Kanji of the Day</div>
+          <div class="kotd-body">
+            <div class="kotd-kanji">${kotd.character}</div>
+            <div class="kotd-info">
+              <div class="kotd-meanings">${kotdMeanings}</div>
+              <div class="kotd-readings">${kotdReadings}</div>
+              <div class="kotd-examples">
+                ${kotdExamples}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
     // Sort modes by usage
     const modes = [
@@ -334,23 +377,35 @@ const App = (() => {
 
     container.innerHTML = `
       <div class="dashboard">
-        <div class="sakura-container" aria-hidden="true">
-          ${Array.from({length: 10}, (_, i) => `<div class="sakura-petal"></div>`).join('')}
+        <div class="sumi-e-hero">
+          <div class="sakura-container" aria-hidden="true">
+            ${Array.from({length: 18}, (_, i) => `<div class="sakura-petal"></div>`).join('')}
+          </div>
+          <div class="hero-kanji-bg" aria-hidden="true">
+            <span class="hero-kanji" style="--delay: 0s">学</span>
+            <span class="hero-kanji" style="--delay: 2s">語</span>
+            <span class="hero-kanji" style="--delay: 4s">読</span>
+            <span class="hero-kanji" style="--delay: 1s">書</span>
+            <span class="hero-kanji" style="--delay: 3s">話</span>
+          </div>
+          <div class="hero-content">
+            <h1 class="hero-title">
+              <span class="title-jp">漢字マスター</span>
+              <span class="title-en">N5 Vocabulary</span>
+            </h1>
+            ${streak.currentStreak > 0 ? `
+              <div class="streak-badge" title="Study streak">
+                <span class="streak-fire">🔥</span>
+                <span class="streak-count">${streak.currentStreak}</span>
+                <span class="streak-label">day${streak.currentStreak !== 1 ? 's' : ''}</span>
+              </div>
+            ` : ''}
+            <p class="hero-phrase" id="hero-phrase">${heroPhrase}</p>
+            <a href="#/flashcards" class="hero-cta">Start Studying</a>
+          </div>
         </div>
 
-        <div class="dashboard-header">
-          <h1 class="dashboard-title">
-            <span class="title-jp">漢字マスター</span>
-            <span class="title-en">N5 Vocabulary</span>
-          </h1>
-          ${streak.currentStreak > 0 ? `
-            <div class="streak-badge" title="Study streak">
-              <span class="streak-fire">🔥</span>
-              <span class="streak-count">${streak.currentStreak}</span>
-              <span class="streak-label">day${streak.currentStreak !== 1 ? 's' : ''}</span>
-            </div>
-          ` : ''}
-        </div>
+        ${kotdHtml}
 
         <!-- Quick Stats Bar -->
         <div class="quick-stats-bar">
@@ -485,6 +540,14 @@ const App = (() => {
         </div>
       </div>
     `;
+
+    // KOTD click handler
+    if (kotdChar) {
+      document.getElementById('kotd-card')?.addEventListener('click', () => {
+        pendingKotdChar = kotdChar;
+        window.location.hash = '#/kanji';
+      });
+    }
 
     // Reset handler
     document.getElementById('reset-btn')?.addEventListener('click', () => {
@@ -1237,48 +1300,126 @@ const App = (() => {
     }
 
     const kanjiList = KanjiHelper.getKanjiList();
+    const categoryCounts = KanjiHelper.getKanjiCategories();
     let currentDetailChar = null;
+    let currentCategory = 'all';
 
     function renderBrowse() {
+      const cats = ['all', ...Object.keys(N5_CATEGORIES).filter(c => categoryCounts[c])];
+      
+      const renderSidebarItems = () => cats.map(c => `
+        <div class="kanji-sidebar-item ${currentCategory === c ? 'active' : ''}" data-cat="${c}">
+          <span class="kanji-sidebar-item-icon">${c === 'all' ? '全' : N5_CATEGORIES[c].icon}</span>
+          <span class="kanji-sidebar-item-name">${c === 'all' ? 'All Kanji' : N5_CATEGORIES[c].name}</span>
+          <span class="kanji-sidebar-item-count">${c === 'all' ? kanjiList.length : categoryCounts[c]}</span>
+        </div>
+      `).join('');
+
       container.innerHTML = `
-        <div class="categories-view">
-          <div class="view-header">
-            <h1>漢 Kanji Study</h1>
-            <p class="view-subtitle">${KanjiHelper.getKanjiCount()} unique kanji characters from N5 vocabulary</p>
+        <div class="view-header">
+          <h1>漢 Kanji Study</h1>
+          <p class="view-subtitle">${KanjiHelper.getKanjiCount()} unique kanji characters from N5 vocabulary</p>
+        </div>
+        ${renderInstructions('About Kanji Study', [
+          'Browse all kanji characters found in the N5 vocabulary',
+          'Use the sidebar to filter kanji by vocabulary category',
+          'Click any kanji card to see its details, readings, and example words',
+          'Kanji with more associated words appear first',
+        ])}
+        <div class="kanji-study-layout">
+          <!-- Mobile Toggle -->
+          <button class="kanji-sidebar-toggle" id="kanji-sidebar-toggle">
+            <span class="kanji-sidebar-toggle-text">${currentCategory === 'all' ? 'All Kanji' : N5_CATEGORIES[currentCategory].name}</span>
+            <span class="kanji-sidebar-toggle-icon">▼</span>
+          </button>
+          
+          <!-- Mobile Dropdown -->
+          <div class="kanji-sidebar-mobile" id="kanji-sidebar-mobile">
+            ${renderSidebarItems()}
           </div>
-          ${renderInstructions('About Kanji Study', [
-            'Browse all kanji characters found in the N5 vocabulary',
-            'Click any kanji card to see its details, readings, and example words',
-            'Use the search bar to find specific kanji by character, reading, or meaning',
-            'Kanji with more associated words appear first',
-          ])}
-          <div class="search-bar-container">
-            <input type="text" id="kanji-search" class="search-input" placeholder="Search kanji by character, reading, or meaning..." autocomplete="off" />
+
+          <!-- Desktop Sidebar -->
+          <div class="kanji-sidebar">
+            <div class="kanji-sidebar-title">Categories</div>
+            <div id="kanji-sidebar-list">
+              ${renderSidebarItems()}
+            </div>
           </div>
-          <div class="kanji-grid" id="kanji-grid">
-            ${kanjiList.map(k => {
-              const mastery = Storage.getKanjiMasteryLevel(k.character);
-              return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
-            }).join('')}
+
+          <!-- Main Content -->
+          <div class="kanji-sidebar-content">
+            <div class="search-bar-container">
+              <input type="text" id="kanji-search" class="search-input" placeholder="Search kanji by character, reading, or meaning..." autocomplete="off" />
+            </div>
+            <div class="kanji-grid" id="kanji-grid">
+              <!-- Rendered via JS -->
+            </div>
+            <div id="kanji-detail-panel" style="display:none;"></div>
           </div>
-          <div id="kanji-detail-panel" style="display:none;"></div>
         </div>
       `;
+
+      updateGrid();
+
+      // Sidebar events
+      container.querySelectorAll('.kanji-sidebar-item').forEach(el => {
+        el.addEventListener('click', () => {
+          currentCategory = el.dataset.cat;
+          document.getElementById('kanji-search').value = '';
+          document.getElementById('kanji-sidebar-mobile').classList.remove('open');
+          document.getElementById('kanji-sidebar-toggle').classList.remove('open');
+          
+          // Update toggle text
+          const toggleText = document.querySelector('.kanji-sidebar-toggle-text');
+          if (toggleText) toggleText.textContent = currentCategory === 'all' ? 'All Kanji' : N5_CATEGORIES[currentCategory].name;
+          
+          // Update active classes
+          container.querySelectorAll('.kanji-sidebar-item').forEach(i => i.classList.remove('active'));
+          container.querySelectorAll(`.kanji-sidebar-item[data-cat="${currentCategory}"]`).forEach(i => i.classList.add('active'));
+          
+          updateGrid();
+        });
+      });
+
+      // Mobile toggle event
+      document.getElementById('kanji-sidebar-toggle')?.addEventListener('click', (e) => {
+        const btn = e.currentTarget;
+        const panel = document.getElementById('kanji-sidebar-mobile');
+        btn.classList.toggle('open');
+        panel.classList.toggle('open');
+      });
 
       document.getElementById('kanji-grid').addEventListener('click', e => {
         const card = e.target.closest('.kanji-card');
         if (card) showKanjiDetail(card.dataset.char);
       });
 
-      document.getElementById('kanji-search').addEventListener('input', e => {
-        const query = e.target.value.trim();
-        const results = query ? KanjiHelper.searchKanji(query) : kanjiList;
-        const grid = document.getElementById('kanji-grid');
-        grid.innerHTML = results.map(k => {
-          const mastery = Storage.getKanjiMasteryLevel(k.character);
-          return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
-        }).join('');
-      });
+      document.getElementById('kanji-search').addEventListener('input', updateGrid);
+    }
+
+    function updateGrid() {
+      const grid = document.getElementById('kanji-grid');
+      const panel = document.getElementById('kanji-detail-panel');
+      const search = document.getElementById('kanji-search').value.trim().toLowerCase();
+      
+      grid.style.display = '';
+      panel.style.display = 'none';
+      currentDetailChar = null;
+
+      let list = KanjiHelper.getKanjiByCategory(currentCategory);
+      if (search) {
+        list = list.filter(k => 
+          k.character === search ||
+          k.readings.some(r => r.includes(search)) ||
+          k.meanings.some(m => m.toLowerCase().includes(search)) ||
+          k.words.some(w => w.kanji.includes(search))
+        );
+      }
+
+      grid.innerHTML = list.map(k => {
+        const mastery = Storage.getKanjiMasteryLevel(k.character);
+        return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
+      }).join('');
     }
 
     function showKanjiDetail(char) {
@@ -1294,7 +1435,7 @@ const App = (() => {
       const mastery = Storage.getKanjiMasteryLevel(char);
       panel.innerHTML = `
         <div class="kanji-detail">
-          <button class="btn btn-secondary btn-sm" id="back-to-kanji">← Back to Kanji List</button>
+          <button class="btn btn-secondary btn-sm" id="back-to-kanji">← Back to Grid</button>
           <div class="kanji-detail-char">${char}</div>
           <span class="tag tag-${mastery}" style="display: block; text-align: center; margin-bottom: 1rem; width: fit-content; margin-left: auto; margin-right: auto;">${mastery}</span>
 
@@ -1324,6 +1465,12 @@ const App = (() => {
     }
 
     renderBrowse();
+    
+    // Check if we arrived here from KotD
+    if (typeof pendingKotdChar !== 'undefined' && pendingKotdChar) {
+      showKanjiDetail(pendingKotdChar);
+      pendingKotdChar = null;
+    }
   }
 
   // ═══════════════════════════════════════════════════════════

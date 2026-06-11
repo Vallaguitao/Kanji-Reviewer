@@ -1650,17 +1650,64 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes sakuraFall {
   0% {
     opacity: 0;
-    transform: translate(0, -10%) rotate(0deg);
+    transform: translate3d(0, -10%, 0) rotate(0deg) scale(1);
   }
   10% {
-    opacity: 1;
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate3d(-30px, 50%, 0) rotate(360deg) scale(0.95);
   }
   90% {
-    opacity: 0.8;
+    opacity: 0.4;
   }
   100% {
     opacity: 0;
-    transform: translate(-60px, 110vh) rotate(720deg);
+    transform: translate3d(-60px, 110%, 0) rotate(720deg) scale(0.85);
+  }
+}
+
+@keyframes sakuraFallAlt {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10%, 0) rotate(0deg) scale(1);
+  }
+  10% {
+    opacity: 0.85;
+  }
+  40% {
+    opacity: 0.6;
+    transform: translate3d(25px, 40%, 0) rotate(-200deg) scale(1.05);
+  }
+  70% {
+    opacity: 0.5;
+    transform: translate3d(-15px, 70%, 0) rotate(-400deg) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(40px, 110%, 0) rotate(-600deg) scale(0.8);
+  }
+}
+
+@keyframes sakuraFallDrift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -5%, 0) rotate(15deg) scale(1);
+  }
+  15% {
+    opacity: 0.75;
+  }
+  35% {
+    transform: translate3d(-40px, 35%, 0) rotate(180deg) scale(1.1);
+  }
+  65% {
+    opacity: 0.45;
+    transform: translate3d(20px, 65%, 0) rotate(400deg) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-20px, 110%, 0) rotate(600deg) scale(0.75);
   }
 }
 
@@ -1712,11 +1759,11 @@ h1, h2, h3, h4, h5, h6 {
    ============================================================ */
 
 .sakura-container {
-  position: fixed;
+  position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .sakura-petal {
@@ -1727,85 +1774,184 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50% 0 50% 0;
   opacity: 0;
   animation: sakuraFall linear infinite;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
+/* Small petals (~6px) */
 .sakura-petal:nth-child(1) {
-  left: 10%;
-  width: 8px;
-  height: 8px;
-  animation-duration: 12s;
+  left: 8%;
+  width: 6px;
+  height: 6px;
+  animation-duration: 11s;
   animation-delay: 0s;
 }
 
 .sakura-petal:nth-child(2) {
-  left: 25%;
-  width: 12px;
-  height: 12px;
-  animation-duration: 15s;
+  left: 22%;
+  width: 6px;
+  height: 6px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 14s;
   animation-delay: 2s;
 }
 
 .sakura-petal:nth-child(3) {
-  left: 45%;
-  width: 7px;
-  height: 7px;
+  left: 48%;
+  width: 5px;
+  height: 5px;
   animation-duration: 10s;
   animation-delay: 4s;
 }
 
 .sakura-petal:nth-child(4) {
-  left: 60%;
-  width: 10px;
-  height: 10px;
-  animation-duration: 14s;
+  left: 65%;
+  width: 7px;
+  height: 7px;
+  animation-name: sakuraFallDrift;
+  animation-duration: 13s;
   animation-delay: 1s;
 }
 
 .sakura-petal:nth-child(5) {
-  left: 78%;
-  width: 9px;
-  height: 9px;
-  animation-duration: 11s;
+  left: 85%;
+  width: 6px;
+  height: 6px;
+  animation-duration: 12s;
+  animation-delay: 5.5s;
+}
+
+/* Medium petals (~10px) */
+.sakura-petal:nth-child(6) {
+  left: 15%;
+  width: 10px;
+  height: 10px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 16s;
   animation-delay: 3s;
 }
 
-.sakura-petal:nth-child(6) {
-  left: 90%;
-  width: 6px;
-  height: 6px;
-  animation-duration: 16s;
-  animation-delay: 5s;
-}
-
 .sakura-petal:nth-child(7) {
-  left: 5%;
-  width: 11px;
-  height: 11px;
+  left: 35%;
+  width: 9px;
+  height: 9px;
   animation-duration: 13s;
   animation-delay: 7s;
 }
 
 .sakura-petal:nth-child(8) {
-  left: 38%;
-  width: 8px;
-  height: 8px;
-  animation-duration: 17s;
-  animation-delay: 6s;
-}
-
-.sakura-petal:nth-child(9) {
   left: 55%;
   width: 10px;
   height: 10px;
-  animation-duration: 12s;
-  animation-delay: 8s;
+  animation-name: sakuraFallDrift;
+  animation-duration: 17s;
+  animation-delay: 1.5s;
+}
+
+.sakura-petal:nth-child(9) {
+  left: 72%;
+  width: 11px;
+  height: 11px;
+  animation-duration: 14s;
+  animation-delay: 6s;
 }
 
 .sakura-petal:nth-child(10) {
-  left: 72%;
+  left: 92%;
+  width: 10px;
+  height: 10px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 15s;
+  animation-delay: 4s;
+}
+
+/* Large petals (~14px) */
+.sakura-petal:nth-child(11) {
+  left: 5%;
+  width: 14px;
+  height: 14px;
+  animation-name: sakuraFallDrift;
+  animation-duration: 18s;
+  animation-delay: 2.5s;
+}
+
+.sakura-petal:nth-child(12) {
+  left: 28%;
+  width: 13px;
+  height: 13px;
+  animation-duration: 15s;
+  animation-delay: 8s;
+}
+
+.sakura-petal:nth-child(13) {
+  left: 42%;
+  width: 14px;
+  height: 14px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 19s;
+  animation-delay: 0.5s;
+}
+
+.sakura-petal:nth-child(14) {
+  left: 58%;
+  width: 12px;
+  height: 12px;
+  animation-name: sakuraFallDrift;
+  animation-duration: 16s;
+  animation-delay: 5s;
+}
+
+.sakura-petal:nth-child(15) {
+  left: 78%;
+  width: 14px;
+  height: 14px;
+  animation-duration: 20s;
+  animation-delay: 3.5s;
+}
+
+/* Extra variety petals (16-20) */
+.sakura-petal:nth-child(16) {
+  left: 12%;
+  width: 8px;
+  height: 8px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 12s;
+  animation-delay: 9s;
+}
+
+.sakura-petal:nth-child(17) {
+  left: 33%;
+  width: 11px;
+  height: 11px;
+  animation-name: sakuraFallDrift;
+  animation-duration: 14s;
+  animation-delay: 6.5s;
+}
+
+.sakura-petal:nth-child(18) {
+  left: 50%;
   width: 7px;
   height: 7px;
-  animation-duration: 14s;
+  animation-duration: 11s;
+  animation-delay: 10s;
+}
+
+.sakura-petal:nth-child(19) {
+  left: 68%;
+  width: 13px;
+  height: 13px;
+  animation-name: sakuraFallAlt;
+  animation-duration: 17s;
+  animation-delay: 7.5s;
+}
+
+.sakura-petal:nth-child(20) {
+  left: 88%;
+  width: 9px;
+  height: 9px;
+  animation-name: sakuraFallDrift;
+  animation-duration: 13s;
   animation-delay: 4.5s;
 }
 
@@ -3853,5 +3999,788 @@ h1, h2, h3, h4, h5, h6 {
 
   .quick-stats-bar {
     grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================
+   R1. KANJI CATEGORY SIDEBAR
+   ============================================================ */
+
+/* ─── Layout Container: sidebar + content ─────────────────── */
+.kanji-study-layout {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  min-height: 60vh;
+}
+
+/* ─── Sidebar ──────────────────────────────────────────────── */
+.kanji-sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 120px);
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
+  padding: var(--space-md) 0;
+  scrollbar-width: thin;
+  scrollbar-color: hsla(235, 30%, 35%, 0.3) transparent;
+}
+
+.kanji-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.kanji-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kanji-sidebar::-webkit-scrollbar-thumb {
+  background: hsla(235, 30%, 35%, 0.4);
+  border-radius: var(--radius-full);
+}
+
+.kanji-sidebar-title {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-sm) var(--space-lg);
+  margin-bottom: var(--space-xs);
+}
+
+/* ─── Sidebar Item ─────────────────────────────────────────── */
+.kanji-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base),
+              border-color var(--transition-base);
+  border-left: 3px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.kanji-sidebar-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.kanji-sidebar-item.active {
+  background: hsla(340, 80%, 65%, 0.08);
+  border-left-color: var(--accent-sakura);
+  color: var(--accent-sakura);
+  font-weight: 600;
+}
+
+.kanji-sidebar-item-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  width: 1.5em;
+  text-align: center;
+  font-family: var(--font-jp);
+}
+
+.kanji-sidebar-item-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kanji-sidebar-item-count {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.kanji-sidebar-item.active .kanji-sidebar-item-count {
+  background: hsla(340, 80%, 65%, 0.15);
+  color: var(--accent-sakura);
+}
+
+/* ─── Sidebar Content Area ─────────────────────────────────── */
+.kanji-sidebar-content {
+  flex: 1;
+  min-width: 0;
+  padding-left: var(--space-lg);
+}
+
+/* ─── Mobile Sidebar Toggle ────────────────────────────────── */
+.kanji-sidebar-toggle {
+  display: none;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: var(--space-md);
+  transition: background var(--transition-base), border-color var(--transition-base);
+  width: 100%;
+  justify-content: center;
+}
+
+.kanji-sidebar-toggle:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-sakura-soft);
+}
+
+.kanji-sidebar-toggle-icon {
+  font-size: 1rem;
+  transition: transform var(--transition-base);
+}
+
+.kanji-sidebar-toggle.open .kanji-sidebar-toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* ─── Mobile Collapsed Panel ───────────────────────────────── */
+.kanji-sidebar-mobile {
+  display: none;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.kanji-sidebar-mobile .kanji-sidebar-item {
+  border-left: none;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border);
+  font-size: 0.8rem;
+}
+
+.kanji-sidebar-mobile .kanji-sidebar-item.active {
+  background: hsla(340, 80%, 65%, 0.12);
+  border-color: var(--accent-sakura);
+}
+
+/* ─── R1 Responsive: ≤768px ────────────────────────────────── */
+@media (max-width: 768px) {
+  .kanji-study-layout {
+    flex-direction: column;
+  }
+
+  .kanji-sidebar {
+    display: none;
+  }
+
+  .kanji-sidebar-toggle {
+    display: flex;
+  }
+
+  .kanji-sidebar-mobile.open {
+    display: flex;
+  }
+
+  .kanji-sidebar-content {
+    padding-left: 0;
+  }
+}
+
+/* ─── R1 Responsive: >768px ────────────────────────────────── */
+@media (min-width: 769px) {
+  .kanji-sidebar-toggle {
+    display: none !important;
+  }
+
+  .kanji-sidebar-mobile {
+    display: none !important;
+  }
+
+  .kanji-sidebar {
+    display: block;
+  }
+}
+
+
+/* ============================================================
+   R2. DASHBOARD SUMI-E HERO SECTION
+   ============================================================ */
+
+/* ─── Hero Keyframes ───────────────────────────────────────── */
+@keyframes brushStroke {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes brushStrokeAlt {
+  0% {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.4;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes brushStrokeSlow {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.35;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes heroPhraseCycle {
+  0%, 18% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  22%, 25% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  28%, 48% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  52%, 55% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  58%, 78% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  82%, 85% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  88%, 100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes inkBleed {
+  0%, 100% {
+    text-shadow:
+      0 0 20px hsla(340, 80%, 65%, 0.2),
+      0 0 40px hsla(235, 30%, 10%, 0.4);
+  }
+  50% {
+    text-shadow:
+      0 0 30px hsla(340, 80%, 65%, 0.3),
+      0 0 60px hsla(235, 30%, 10%, 0.5),
+      2px 2px 8px hsla(235, 40%, 8%, 0.6);
+  }
+}
+
+@keyframes heroGlow {
+  0%, 100% {
+    box-shadow: 0 0 30px hsla(340, 80%, 65%, 0.15), 0 0 60px hsla(340, 80%, 65%, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 40px hsla(340, 80%, 65%, 0.25), 0 0 80px hsla(340, 80%, 65%, 0.1);
+  }
+}
+
+/* ─── Sumi-e Hero Container ────────────────────────────────── */
+.sumi-e-hero {
+  position: relative;
+  width: 100%;
+  min-height: 340px;
+  padding: var(--space-3xl) var(--space-xl);
+  margin-bottom: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  /* Layered ink wash / watercolor background */
+  background:
+    radial-gradient(ellipse at 20% 80%, hsla(340, 40%, 20%, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, hsla(260, 30%, 25%, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, hsla(235, 25%, 12%, 0.9) 0%, transparent 70%),
+    linear-gradient(
+      180deg,
+      hsl(235, 28%, 10%) 0%,
+      hsl(235, 22%, 13%) 35%,
+      hsl(235, 20%, 11%) 70%,
+      hsl(235, 25%, 9%) 100%
+    );
+  border: 1px solid hsla(235, 30%, 25%, 0.4);
+}
+
+/* Ink wash pseudo-element — top fog */
+.sumi-e-hero::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -10%;
+  width: 120%;
+  height: 80%;
+  background:
+    radial-gradient(ellipse at 30% 60%, hsla(235, 20%, 18%, 0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 40%, hsla(260, 25%, 20%, 0.4) 0%, transparent 50%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ink wash pseudo-element — bottom accent */
+.sumi-e-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -5%;
+  width: 80%;
+  height: 60%;
+  background:
+    radial-gradient(ellipse at 60% 30%, hsla(340, 50%, 25%, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 70%, hsla(45, 40%, 25%, 0.1) 0%, transparent 40%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Hero Kanji (Animated Brush Strokes) ──────────────────── */
+.hero-kanji-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-kanji {
+  position: absolute;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  color: hsla(235, 15%, 20%, 0.35);
+  line-height: 1;
+  user-select: none;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.hero-kanji:nth-child(1) {
+  font-size: 8rem;
+  top: 8%;
+  left: 6%;
+  animation: brushStroke 2.5s 0.3s both;
+  color: hsla(235, 15%, 22%, 0.3);
+}
+
+.hero-kanji:nth-child(2) {
+  font-size: 6.5rem;
+  top: 15%;
+  right: 8%;
+  animation: brushStrokeAlt 2.8s 0.8s both;
+  color: hsla(340, 20%, 22%, 0.2);
+}
+
+.hero-kanji:nth-child(3) {
+  font-size: 10rem;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: brushStrokeSlow 3.2s 1.2s both;
+  color: hsla(260, 15%, 20%, 0.18);
+}
+
+.hero-kanji:nth-child(4) {
+  font-size: 5rem;
+  bottom: 20%;
+  left: 15%;
+  animation: brushStroke 2s 1.8s both;
+  color: hsla(235, 20%, 18%, 0.22);
+}
+
+.hero-kanji:nth-child(5) {
+  font-size: 7rem;
+  top: 40%;
+  right: 12%;
+  animation: brushStrokeAlt 2.6s 2.2s both;
+  color: hsla(340, 15%, 20%, 0.15);
+}
+
+/* ─── Hero Title ───────────────────────────────────────────── */
+.hero-title {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-jp);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--text-kanji);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.05em;
+  text-shadow:
+    0 2px 12px hsla(235, 40%, 4%, 0.5),
+    0 0 30px hsla(340, 60%, 50%, 0.1);
+}
+
+.hero-title-en {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: var(--space-xs);
+  text-shadow: none;
+}
+
+/* ─── Hero Phrase (Rotating Motivational) ──────────────────── */
+.hero-phrase {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xl);
+  min-height: 1.5em;
+  animation: heroPhraseCycle 18s ease-in-out infinite;
+}
+
+/* ─── Hero CTA Button ──────────────────────────────────────── */
+.hero-cta {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-2xl);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--accent-sakura-soft), var(--accent-sakura));
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform var(--transition-fast), box-shadow var(--transition-base);
+  animation: heroGlow 3s ease-in-out infinite;
+}
+
+.hero-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 40px hsla(340, 80%, 65%, 0.35), var(--shadow-lg);
+}
+
+.hero-cta:active {
+  transform: translateY(0);
+}
+
+/* ─── R2 Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sumi-e-hero {
+    min-height: 260px;
+    padding: var(--space-2xl) var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-kanji:nth-child(1) {
+    font-size: 5rem;
+  }
+
+  .hero-kanji:nth-child(2) {
+    font-size: 4rem;
+  }
+
+  .hero-kanji:nth-child(3) {
+    font-size: 6rem;
+  }
+
+  .hero-kanji:nth-child(4),
+  .hero-kanji:nth-child(5) {
+    display: none;
+  }
+
+  .hero-cta {
+    padding: var(--space-md) var(--space-xl);
+    font-size: 0.95rem;
+  }
+}
+
+
+/* ============================================================
+   R3. KANJI OF THE DAY CARD
+   ============================================================ */
+
+/* ─── KOTD Card ────────────────────────────────────────────── */
+.kotd-card {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto var(--space-2xl);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform var(--transition-spring), box-shadow var(--transition-base);
+
+  /* Rice-paper / parchment feel via layered CSS gradients */
+  background:
+    repeating-linear-gradient(
+      0deg,
+      hsla(35, 25%, 30%, 0.03) 0px,
+      hsla(35, 25%, 30%, 0.03) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      hsla(35, 20%, 28%, 0.02) 0px,
+      hsla(35, 20%, 28%, 0.02) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    linear-gradient(
+      145deg,
+      hsl(235, 18%, 14%) 0%,
+      hsl(30, 8%, 16%) 30%,
+      hsl(235, 15%, 15%) 60%,
+      hsl(235, 18%, 13%) 100%
+    );
+  border: 1px solid hsla(35, 20%, 30%, 0.2);
+  box-shadow: var(--shadow-md);
+}
+
+.kotd-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-sakura-soft) 20%,
+    var(--accent-sakura) 50%,
+    var(--accent-sakura-soft) 80%,
+    transparent 100%
+  );
+  opacity: 0.7;
+}
+
+.kotd-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), 0 0 30px hsla(340, 60%, 50%, 0.08);
+}
+
+/* ─── KOTD Layout ──────────────────────────────────────────── */
+.kotd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.kotd-label {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.kotd-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.kotd-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+}
+
+/* ─── KOTD Kanji ───────────────────────────────────────────── */
+.kotd-kanji {
+  font-family: var(--font-jp);
+  font-size: 6rem;
+  font-weight: 900;
+  color: var(--text-kanji);
+  line-height: 1;
+  flex-shrink: 0;
+  text-shadow:
+    2px 2px 4px hsla(235, 40%, 4%, 0.5),
+    0 0 20px hsla(340, 60%, 50%, 0.15),
+    -1px -1px 0 hsla(235, 20%, 30%, 0.3);
+  animation: inkBleed 4s ease-in-out infinite;
+}
+
+/* ─── KOTD Info ────────────────────────────────────────────── */
+.kotd-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.kotd-meanings {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-kanji);
+  margin-bottom: var(--space-sm);
+  line-height: 1.3;
+}
+
+.kotd-readings {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.kotd-reading-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kotd-reading-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kotd-reading-value {
+  font-family: var(--font-jp);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--accent-sakura);
+}
+
+.kotd-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.kotd-example {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: hsla(235, 20%, 14%, 0.5);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.kotd-example-word {
+  font-family: var(--font-jp);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.kotd-example-reading {
+  font-family: var(--font-jp);
+  font-size: 0.78rem;
+  color: var(--accent-sakura);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.kotd-example-meaning {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+/* ─── KOTD Arrow / Hint ────────────────────────────────────── */
+.kotd-arrow {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  flex-shrink: 0;
+}
+
+.kotd-card:hover .kotd-arrow {
+  opacity: 0.8;
+  transform: translateX(4px);
+}
+
+/* ─── R3 Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .kotd-card {
+    padding: var(--space-xl);
+  }
+
+  .kotd-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+
+  .kotd-kanji {
+    font-size: 4.5rem;
+    align-self: center;
+  }
+
+  .kotd-meanings {
+    font-size: 1.1rem;
+  }
+
+  .kotd-arrow {
+    display: none;
   }
 }
