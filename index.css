@@ -26,6 +26,7 @@
   /* Text */
   --text-primary: hsl(235, 10%, 90%);
   --text-secondary: hsl(235, 10%, 60%);
+  --text-dim: hsl(235, 10%, 55%);
   --text-kanji: hsl(0, 0%, 100%);
 
   /* Glassmorphism */
@@ -80,6 +81,7 @@
   /* Text */
   --text-primary: hsl(235, 15%, 15%);
   --text-secondary: hsl(235, 10%, 40%);
+  --text-dim: hsl(235, 10%, 46%);
   --text-kanji: hsl(0, 0%, 10%);
   
   /* Glassmorphism */
@@ -331,8 +333,8 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
@@ -348,6 +350,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .nav-action-icon {
   font-size: 1.2rem;
+}
+
+.nav-icon svg,
+.nav-action-icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
 
 /* ─── View Container ───────────────────────────────────────── */
@@ -648,8 +657,7 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   bottom: var(--space-lg);
   font-size: 0.8rem;
-  color: var(--text-secondary);
-  opacity: 0.6;
+  color: var(--text-dim);
 }
 
 /* ─── Speaker Button ───────────────────────────────────────── */
@@ -657,8 +665,9 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
   background: var(--bg-tertiary);
@@ -1309,7 +1318,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-sakura-soft), var(--accent-sakura));
+  background: linear-gradient(135deg, var(--accent-sakura-soft), hsl(340, 75%, 47%));
   border-color: transparent;
   color: white;
 }
@@ -1329,7 +1338,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-success {
-  background: linear-gradient(135deg, hsl(150, 60%, 32%), var(--accent-success));
+  background: linear-gradient(135deg, hsl(150, 60%, 32%), hsl(150, 65%, 33%));
   border-color: transparent;
   color: white;
 }
@@ -1339,7 +1348,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, hsl(0, 60%, 38%), var(--accent-error));
+  background: linear-gradient(135deg, hsl(0, 60%, 38%), hsl(0, 70%, 52%));
   border-color: transparent;
   color: white;
 }
@@ -1460,8 +1469,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
