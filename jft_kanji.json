@@ -1,0 +1,2804 @@
+{
+  "title": "JFT Final Kanji",
+  "source": "JFT Final Kanji Reference Sheet",
+  "totalEntries": 545,
+  "categories": [
+    {
+      "id": "nouns",
+      "label": "Nouns",
+      "entries": [
+        {
+          "kanji": "私",
+          "hiragana": "わたし",
+          "english": "I, me"
+        },
+        {
+          "kanji": "彼",
+          "hiragana": "かれ",
+          "english": "he"
+        },
+        {
+          "kanji": "彼女",
+          "hiragana": "かのじょ",
+          "english": "she"
+        },
+        {
+          "kanji": "君",
+          "hiragana": "きみ",
+          "english": "you (casual)"
+        }
+      ]
+    },
+    {
+      "id": "family",
+      "label": "Family",
+      "entries": [
+        {
+          "kanji": "家族",
+          "hiragana": "かぞく",
+          "english": "family"
+        },
+        {
+          "kanji": "両親",
+          "hiragana": "りょうしん",
+          "english": "parents"
+        },
+        {
+          "kanji": "父",
+          "hiragana": "ちち",
+          "english": "father"
+        },
+        {
+          "kanji": "お父さん",
+          "hiragana": "おとうさん",
+          "english": "father (honorific)"
+        },
+        {
+          "kanji": "母",
+          "hiragana": "はは",
+          "english": "mother"
+        },
+        {
+          "kanji": "お母さん",
+          "hiragana": "おかあさん",
+          "english": "mother (honorific)"
+        },
+        {
+          "kanji": "ご主人",
+          "hiragana": "ごしゅじん",
+          "english": "husband"
+        },
+        {
+          "kanji": "奥さん",
+          "hiragana": "おくさん",
+          "english": "wife"
+        },
+        {
+          "kanji": "兄弟",
+          "hiragana": "きょうだい",
+          "english": "siblings"
+        },
+        {
+          "kanji": "姉妹",
+          "hiragana": "しまい",
+          "english": "sisters"
+        },
+        {
+          "kanji": "兄",
+          "hiragana": "あに",
+          "english": "older brother"
+        },
+        {
+          "kanji": "姉",
+          "hiragana": "あね",
+          "english": "older sister"
+        },
+        {
+          "kanji": "弟",
+          "hiragana": "おとうと",
+          "english": "younger brother"
+        },
+        {
+          "kanji": "妹",
+          "hiragana": "いもうと",
+          "english": "younger sister"
+        },
+        {
+          "kanji": "息子",
+          "hiragana": "むすこ",
+          "english": "son"
+        },
+        {
+          "kanji": "娘",
+          "hiragana": "むすめ",
+          "english": "daughter"
+        },
+        {
+          "kanji": "お子さん",
+          "hiragana": "おこさん",
+          "english": "child"
+        }
+      ]
+    },
+    {
+      "id": "interrogatives",
+      "label": "Interrogatives",
+      "entries": [
+        {
+          "kanji": "何",
+          "hiragana": "なに/なん",
+          "english": "what"
+        },
+        {
+          "kanji": "何曜日",
+          "hiragana": "なんようび",
+          "english": "what day"
+        },
+        {
+          "kanji": "何日",
+          "hiragana": "なんにち",
+          "english": "what day / how many days"
+        },
+        {
+          "kanji": "何時",
+          "hiragana": "なんじ",
+          "english": "what time"
+        },
+        {
+          "kanji": "何分",
+          "hiragana": "なんふん",
+          "english": "what minute / how many minutes"
+        },
+        {
+          "kanji": "何時間",
+          "hiragana": "なんじかん",
+          "english": "how many hours"
+        },
+        {
+          "kanji": "何月",
+          "hiragana": "なんがつ",
+          "english": "what month"
+        },
+        {
+          "kanji": "何ヶ月",
+          "hiragana": "なんかげつ",
+          "english": "how many months"
+        },
+        {
+          "kanji": "何年",
+          "hiragana": "なんねん",
+          "english": "what year / how many years"
+        }
+      ]
+    },
+    {
+      "id": "body_parts",
+      "label": "Parts of the Body",
+      "entries": [
+        {
+          "kanji": "体",
+          "hiragana": "からだ",
+          "english": "body"
+        },
+        {
+          "kanji": "頭",
+          "hiragana": "あたま",
+          "english": "head"
+        },
+        {
+          "kanji": "顔",
+          "hiragana": "かお",
+          "english": "face"
+        },
+        {
+          "kanji": "目",
+          "hiragana": "め",
+          "english": "eyes"
+        },
+        {
+          "kanji": "耳",
+          "hiragana": "みみ",
+          "english": "ears"
+        },
+        {
+          "kanji": "鼻",
+          "hiragana": "はな",
+          "english": "nose"
+        },
+        {
+          "kanji": "口",
+          "hiragana": "くち",
+          "english": "mouth"
+        },
+        {
+          "kanji": "首",
+          "hiragana": "くび",
+          "english": "neck"
+        },
+        {
+          "kanji": "手",
+          "hiragana": "て",
+          "english": "hands"
+        },
+        {
+          "kanji": "足",
+          "hiragana": "あし",
+          "english": "legs/feet"
+        },
+        {
+          "kanji": "心",
+          "hiragana": "こころ",
+          "english": "heart/mind"
+        }
+      ]
+    },
+    {
+      "id": "colors",
+      "label": "Colors",
+      "entries": [
+        {
+          "kanji": "色",
+          "hiragana": "いろ",
+          "english": "color"
+        },
+        {
+          "kanji": "白(い)",
+          "hiragana": "しろ(い)",
+          "english": "white"
+        },
+        {
+          "kanji": "黒(い)",
+          "hiragana": "くろ(い)",
+          "english": "black"
+        },
+        {
+          "kanji": "赤(い)",
+          "hiragana": "あか(い)",
+          "english": "red"
+        },
+        {
+          "kanji": "青(い)",
+          "hiragana": "あお(い)",
+          "english": "blue"
+        },
+        {
+          "kanji": "黄色(い)",
+          "hiragana": "きいろ(い)",
+          "english": "yellow"
+        }
+      ]
+    },
+    {
+      "id": "days_of_week",
+      "label": "Days of the Week",
+      "entries": [
+        {
+          "kanji": "月曜",
+          "hiragana": "げつようび",
+          "english": "Monday"
+        },
+        {
+          "kanji": "火曜",
+          "hiragana": "かようび",
+          "english": "Tuesday"
+        },
+        {
+          "kanji": "水曜",
+          "hiragana": "すいようび",
+          "english": "Wednesday"
+        },
+        {
+          "kanji": "木曜",
+          "hiragana": "もくようび",
+          "english": "Thursday"
+        },
+        {
+          "kanji": "金曜",
+          "hiragana": "きんようび",
+          "english": "Friday"
+        },
+        {
+          "kanji": "土曜",
+          "hiragana": "どうようび",
+          "english": "Saturday"
+        },
+        {
+          "kanji": "日曜",
+          "hiragana": "にちようび",
+          "english": "Sunday"
+        }
+      ]
+    },
+    {
+      "id": "months",
+      "label": "Months",
+      "entries": [
+        {
+          "kanji": "一月",
+          "hiragana": "いちがつ",
+          "english": "January"
+        },
+        {
+          "kanji": "二月",
+          "hiragana": "にがつ",
+          "english": "February"
+        },
+        {
+          "kanji": "三月",
+          "hiragana": "さんがつ",
+          "english": "March"
+        },
+        {
+          "kanji": "四月",
+          "hiragana": "しがつ",
+          "english": "April"
+        },
+        {
+          "kanji": "五月",
+          "hiragana": "ごがつ",
+          "english": "May"
+        },
+        {
+          "kanji": "六月",
+          "hiragana": "ろくがつ",
+          "english": "June"
+        },
+        {
+          "kanji": "七月",
+          "hiragana": "しちがつ",
+          "english": "July"
+        },
+        {
+          "kanji": "八月",
+          "hiragana": "はちがつ",
+          "english": "August"
+        },
+        {
+          "kanji": "九月",
+          "hiragana": "くがつ",
+          "english": "September"
+        },
+        {
+          "kanji": "十月",
+          "hiragana": "じゅうがつ",
+          "english": "October"
+        },
+        {
+          "kanji": "十一月",
+          "hiragana": "じゅういちがつ",
+          "english": "November"
+        },
+        {
+          "kanji": "十二月",
+          "hiragana": "じゅうにがつ",
+          "english": "December"
+        }
+      ]
+    },
+    {
+      "id": "days_of_month",
+      "label": "Days of the Month",
+      "entries": [
+        {
+          "kanji": "一日",
+          "hiragana": "いちにち・ついたち",
+          "english": "1st day"
+        },
+        {
+          "kanji": "二日",
+          "hiragana": "ふつか",
+          "english": "2nd day"
+        },
+        {
+          "kanji": "三日",
+          "hiragana": "みっか",
+          "english": "3rd day"
+        },
+        {
+          "kanji": "四日",
+          "hiragana": "よっか",
+          "english": "4th day"
+        },
+        {
+          "kanji": "五日",
+          "hiragana": "いつか",
+          "english": "5th day"
+        },
+        {
+          "kanji": "六日",
+          "hiragana": "むいか",
+          "english": "6th day"
+        },
+        {
+          "kanji": "七日",
+          "hiragana": "なのか",
+          "english": "7th day"
+        },
+        {
+          "kanji": "八日",
+          "hiragana": "ようか",
+          "english": "8th day"
+        },
+        {
+          "kanji": "九日",
+          "hiragana": "ここのか",
+          "english": "9th day"
+        },
+        {
+          "kanji": "十日",
+          "hiragana": "とお",
+          "english": "10th day"
+        },
+        {
+          "kanji": "二十日",
+          "hiragana": "はつか",
+          "english": "20th day"
+        }
+      ]
+    },
+    {
+      "id": "adverbs_of_time",
+      "label": "Adverbs of Time",
+      "entries": [
+        {
+          "kanji": "今",
+          "hiragana": "いま",
+          "english": "now"
+        },
+        {
+          "kanji": "今日",
+          "hiragana": "きょう",
+          "english": "today"
+        },
+        {
+          "kanji": "本日",
+          "hiragana": "ほんじつ",
+          "english": "today (formal)"
+        },
+        {
+          "kanji": "明日",
+          "hiragana": "あした",
+          "english": "tomorrow"
+        },
+        {
+          "kanji": "昨日",
+          "hiragana": "きのう",
+          "english": "yesterday"
+        },
+        {
+          "kanji": "日",
+          "hiragana": "にち",
+          "english": "day"
+        },
+        {
+          "kanji": "朝",
+          "hiragana": "あさ",
+          "english": "morning"
+        },
+        {
+          "kanji": "昼",
+          "hiragana": "ひる",
+          "english": "noon"
+        },
+        {
+          "kanji": "夜",
+          "hiragana": "よる",
+          "english": "evening"
+        },
+        {
+          "kanji": "晩",
+          "hiragana": "ばん",
+          "english": "night"
+        },
+        {
+          "kanji": "昼間",
+          "hiragana": "ひるま",
+          "english": "daytime"
+        },
+        {
+          "kanji": "夕方",
+          "hiragana": "ゆうがた",
+          "english": "evening"
+        },
+        {
+          "kanji": "昨夜",
+          "hiragana": "ゆうべ",
+          "english": "last night"
+        },
+        {
+          "kanji": "今夜",
+          "hiragana": "こんや",
+          "english": "tonight"
+        },
+        {
+          "kanji": "今晩",
+          "hiragana": "こんばん",
+          "english": "tonight"
+        },
+        {
+          "kanji": "今度",
+          "hiragana": "こんど",
+          "english": "next time"
+        },
+        {
+          "kanji": "後で",
+          "hiragana": "あとで",
+          "english": "later"
+        },
+        {
+          "kanji": "前",
+          "hiragana": "まえ",
+          "english": "before"
+        },
+        {
+          "kanji": "毎朝",
+          "hiragana": "まいあさ",
+          "english": "every morning"
+        },
+        {
+          "kanji": "毎日",
+          "hiragana": "まいにち",
+          "english": "every day"
+        },
+        {
+          "kanji": "毎晩",
+          "hiragana": "まいばん",
+          "english": "every night"
+        },
+        {
+          "kanji": "毎週",
+          "hiragana": "まいしゅう",
+          "english": "every week"
+        },
+        {
+          "kanji": "毎月",
+          "hiragana": "まいつき",
+          "english": "every month"
+        },
+        {
+          "kanji": "毎年",
+          "hiragana": "まいとし",
+          "english": "every year"
+        },
+        {
+          "kanji": "今週",
+          "hiragana": "こんしゅう",
+          "english": "this week"
+        },
+        {
+          "kanji": "来週",
+          "hiragana": "らいしゅう",
+          "english": "next week"
+        },
+        {
+          "kanji": "先週",
+          "hiragana": "せんしゅう",
+          "english": "last week"
+        },
+        {
+          "kanji": "今月",
+          "hiragana": "こんげつ",
+          "english": "this month"
+        },
+        {
+          "kanji": "来月",
+          "hiragana": "らいげつ",
+          "english": "next month"
+        },
+        {
+          "kanji": "先月",
+          "hiragana": "せんげつ",
+          "english": "last month"
+        },
+        {
+          "kanji": "今年",
+          "hiragana": "ことし",
+          "english": "this year"
+        },
+        {
+          "kanji": "来年",
+          "hiragana": "らいねん",
+          "english": "next year"
+        },
+        {
+          "kanji": "去年",
+          "hiragana": "きょねん",
+          "english": "last year"
+        },
+        {
+          "kanji": "午前",
+          "hiragana": "ごぜん",
+          "english": "a.m."
+        },
+        {
+          "kanji": "午後",
+          "hiragana": "ごご",
+          "english": "p.m."
+        },
+        {
+          "kanji": "午前中",
+          "hiragana": "ごぜんちゅう",
+          "english": "morning (throughout)"
+        }
+      ]
+    },
+    {
+      "id": "seasons",
+      "label": "Seasons",
+      "entries": [
+        {
+          "kanji": "季節",
+          "hiragana": "きせつ",
+          "english": "season"
+        },
+        {
+          "kanji": "冬",
+          "hiragana": "ふゆ",
+          "english": "winter"
+        },
+        {
+          "kanji": "春",
+          "hiragana": "はる",
+          "english": "spring"
+        },
+        {
+          "kanji": "夏",
+          "hiragana": "なつ",
+          "english": "summer"
+        },
+        {
+          "kanji": "秋",
+          "hiragana": "あき",
+          "english": "fall"
+        }
+      ]
+    },
+    {
+      "id": "directions",
+      "label": "Directions",
+      "entries": [
+        {
+          "kanji": "北",
+          "hiragana": "きた",
+          "english": "north"
+        },
+        {
+          "kanji": "東",
+          "hiragana": "ひがし",
+          "english": "east"
+        },
+        {
+          "kanji": "南",
+          "hiragana": "みなみ",
+          "english": "south"
+        },
+        {
+          "kanji": "西",
+          "hiragana": "にし",
+          "english": "west"
+        },
+        {
+          "kanji": "左",
+          "hiragana": "ひだり",
+          "english": "left"
+        },
+        {
+          "kanji": "右",
+          "hiragana": "みぎ",
+          "english": "right"
+        },
+        {
+          "kanji": "上",
+          "hiragana": "うえ",
+          "english": "up"
+        },
+        {
+          "kanji": "下",
+          "hiragana": "した",
+          "english": "down"
+        },
+        {
+          "kanji": "中",
+          "hiragana": "なか",
+          "english": "inside/middle"
+        },
+        {
+          "kanji": "真ん中",
+          "hiragana": "まんなか",
+          "english": "center"
+        }
+      ]
+    },
+    {
+      "id": "other_kanji",
+      "label": "Other Kanji",
+      "entries": [
+        {
+          "kanji": "人",
+          "hiragana": "ひと",
+          "english": "person"
+        },
+        {
+          "kanji": "雨",
+          "hiragana": "あめ",
+          "english": "rain"
+        },
+        {
+          "kanji": "上着",
+          "hiragana": "うわぎ",
+          "english": "jacket"
+        },
+        {
+          "kanji": "下着",
+          "hiragana": "したぎ",
+          "english": "underwear"
+        },
+        {
+          "kanji": "以上",
+          "hiragana": "いじょう",
+          "english": "more than"
+        },
+        {
+          "kanji": "上手(な)",
+          "hiragana": "じょうず(な)",
+          "english": "skillful"
+        },
+        {
+          "kanji": "下手",
+          "hiragana": "へた",
+          "english": "unskillful"
+        },
+        {
+          "kanji": "田中",
+          "hiragana": "たなか",
+          "english": "Tanaka (Japanese name)"
+        },
+        {
+          "kanji": "中学校",
+          "hiragana": "ちゅうがっこう",
+          "english": "junior high school"
+        },
+        {
+          "kanji": "中学生",
+          "hiragana": "ちゅうがくせい",
+          "english": "junior high school student"
+        },
+        {
+          "kanji": "世界中",
+          "hiragana": "せかいじゅう",
+          "english": "all over the world"
+        },
+        {
+          "kanji": "地下鉄",
+          "hiragana": "ちかてつ",
+          "english": "subway train"
+        },
+        {
+          "kanji": "急行",
+          "hiragana": "きゅうこう",
+          "english": "express"
+        },
+        {
+          "kanji": "説明",
+          "hiragana": "せつめい",
+          "english": "explanation"
+        },
+        {
+          "kanji": "明るい",
+          "hiragana": "あかるい",
+          "english": "bright"
+        },
+        {
+          "kanji": "休み",
+          "hiragana": "やすみ",
+          "english": "rest day/holiday"
+        },
+        {
+          "kanji": "休む",
+          "hiragana": "やすむ",
+          "english": "to take a rest"
+        },
+        {
+          "kanji": "昼休み",
+          "hiragana": "ひるやすみ",
+          "english": "lunch break"
+        },
+        {
+          "kanji": "木",
+          "hiragana": "き",
+          "english": "tree"
+        },
+        {
+          "kanji": "林",
+          "hiragana": "はやし",
+          "english": "woods"
+        },
+        {
+          "kanji": "森",
+          "hiragana": "もり",
+          "english": "forest"
+        },
+        {
+          "kanji": "好き(な)",
+          "hiragana": "すき(な)",
+          "english": "like"
+        },
+        {
+          "kanji": "大好き",
+          "hiragana": "だいすき",
+          "english": "love"
+        },
+        {
+          "kanji": "八百屋",
+          "hiragana": "やおや",
+          "english": "fruit and vegetable stall"
+        },
+        {
+          "kanji": "月",
+          "hiragana": "つき",
+          "english": "moon"
+        },
+        {
+          "kanji": "火",
+          "hiragana": "ひ",
+          "english": "fire"
+        },
+        {
+          "kanji": "水",
+          "hiragana": "みず",
+          "english": "water"
+        },
+        {
+          "kanji": "水道",
+          "hiragana": "すいどう",
+          "english": "water supply"
+        },
+        {
+          "kanji": "水泳",
+          "hiragana": "すいえい",
+          "english": "swimming"
+        },
+        {
+          "kanji": "金",
+          "hiragana": "きん",
+          "english": "gold"
+        },
+        {
+          "kanji": "土",
+          "hiragana": "つち",
+          "english": "soil"
+        },
+        {
+          "kanji": "火事",
+          "hiragana": "かじ",
+          "english": "fire (disaster)"
+        },
+        {
+          "kanji": "正月",
+          "hiragana": "しょうがつ",
+          "english": "New Year"
+        },
+        {
+          "kanji": "お金",
+          "hiragana": "おかね",
+          "english": "money"
+        },
+        {
+          "kanji": "お金持ち",
+          "hiragana": "おかねもち",
+          "english": "rich"
+        },
+        {
+          "kanji": "お土産",
+          "hiragana": "おみやげ",
+          "english": "souvenir"
+        },
+        {
+          "kanji": "魚",
+          "hiragana": "さかな",
+          "english": "fish"
+        },
+        {
+          "kanji": "鳥",
+          "hiragana": "とり",
+          "english": "bird"
+        },
+        {
+          "kanji": "小鳥",
+          "hiragana": "ことり",
+          "english": "small bird"
+        },
+        {
+          "kanji": "牛",
+          "hiragana": "うし",
+          "english": "cow"
+        },
+        {
+          "kanji": "犬",
+          "hiragana": "いぬ",
+          "english": "dog"
+        },
+        {
+          "kanji": "島",
+          "hiragana": "しま",
+          "english": "island"
+        },
+        {
+          "kanji": "電車",
+          "hiragana": "でんしゃ",
+          "english": "train"
+        },
+        {
+          "kanji": "米",
+          "hiragana": "こめ",
+          "english": "rice grain"
+        },
+        {
+          "kanji": "銀行",
+          "hiragana": "ぎんこう",
+          "english": "bank"
+        },
+        {
+          "kanji": "行う",
+          "hiragana": "おこなう",
+          "english": "to hold/conduct"
+        },
+        {
+          "kanji": "旅行",
+          "hiragana": "りょこう",
+          "english": "travel"
+        },
+        {
+          "kanji": "飛行機",
+          "hiragana": "ひこうき",
+          "english": "airplane"
+        },
+        {
+          "kanji": "帰る",
+          "hiragana": "かえる",
+          "english": "to go home"
+        },
+        {
+          "kanji": "寝る",
+          "hiragana": "ねる",
+          "english": "to sleep"
+        },
+        {
+          "kanji": "働く",
+          "hiragana": "はたらく",
+          "english": "to work"
+        },
+        {
+          "kanji": "動く",
+          "hiragana": "うごく",
+          "english": "to move"
+        },
+        {
+          "kanji": "重い",
+          "hiragana": "おもい",
+          "english": "heavy"
+        },
+        {
+          "kanji": "勉強する",
+          "hiragana": "べんきょうする",
+          "english": "to study"
+        },
+        {
+          "kanji": "強い",
+          "hiragana": "つよい",
+          "english": "strong"
+        },
+        {
+          "kanji": "弱い",
+          "hiragana": "よわい",
+          "english": "weak"
+        },
+        {
+          "kanji": "案内",
+          "hiragana": "あんない",
+          "english": "guide"
+        },
+        {
+          "kanji": "案内する",
+          "hiragana": "あんないする",
+          "english": "to guide"
+        },
+        {
+          "kanji": "家",
+          "hiragana": "いえ",
+          "english": "house"
+        },
+        {
+          "kanji": "始める",
+          "hiragana": "はじめる",
+          "english": "to start/to begin"
+        },
+        {
+          "kanji": "終わる",
+          "hiragana": "おわる",
+          "english": "to finish"
+        },
+        {
+          "kanji": "起きる",
+          "hiragana": "おきる",
+          "english": "to wake up"
+        },
+        {
+          "kanji": "起こす",
+          "hiragana": "おこす",
+          "english": "to wake someone up"
+        },
+        {
+          "kanji": "仕事",
+          "hiragana": "しごと",
+          "english": "work/job"
+        },
+        {
+          "kanji": "仕方",
+          "hiragana": "しかた",
+          "english": "way/how to do"
+        },
+        {
+          "kanji": "食事",
+          "hiragana": "しょくじ",
+          "english": "meal"
+        },
+        {
+          "kanji": "用事",
+          "hiragana": "ようじ",
+          "english": "errand"
+        },
+        {
+          "kanji": "大事(な)",
+          "hiragana": "だいじ(な)",
+          "english": "important"
+        },
+        {
+          "kanji": "先生",
+          "hiragana": "せんせい",
+          "english": "teacher"
+        },
+        {
+          "kanji": "生徒",
+          "hiragana": "せいと",
+          "english": "pupil/student"
+        },
+        {
+          "kanji": "生まれる",
+          "hiragana": "うまれる",
+          "english": "to be born"
+        },
+        {
+          "kanji": "学校",
+          "hiragana": "がっこう",
+          "english": "school"
+        },
+        {
+          "kanji": "学生",
+          "hiragana": "がくせい",
+          "english": "student"
+        },
+        {
+          "kanji": "誕生日",
+          "hiragana": "たんじょうび",
+          "english": "birthday"
+        },
+        {
+          "kanji": "先に",
+          "hiragana": "さきに",
+          "english": "first/before"
+        },
+        {
+          "kanji": "留学生",
+          "hiragana": "りゅうがくせい",
+          "english": "exchange student"
+        },
+        {
+          "kanji": "会社",
+          "hiragana": "かいしゃ",
+          "english": "company"
+        },
+        {
+          "kanji": "会社員",
+          "hiragana": "かいしゃいん",
+          "english": "company employee"
+        },
+        {
+          "kanji": "会議",
+          "hiragana": "かいぎ",
+          "english": "meeting"
+        },
+        {
+          "kanji": "会議室",
+          "hiragana": "かいぎしつ",
+          "english": "conference room"
+        },
+        {
+          "kanji": "会う",
+          "hiragana": "あう",
+          "english": "to meet"
+        },
+        {
+          "kanji": "会話",
+          "hiragana": "かいわ",
+          "english": "conversation"
+        },
+        {
+          "kanji": "社会",
+          "hiragana": "しゃかい",
+          "english": "society"
+        },
+        {
+          "kanji": "神社",
+          "hiragana": "じんじゃ",
+          "english": "shrine"
+        },
+        {
+          "kanji": "店員",
+          "hiragana": "てんいん",
+          "english": "clerk"
+        },
+        {
+          "kanji": "半分",
+          "hiragana": "はんぶん",
+          "english": "half"
+        },
+        {
+          "kanji": "分かる",
+          "hiragana": "わかる",
+          "english": "to understand"
+        },
+        {
+          "kanji": "自分",
+          "hiragana": "じぶん",
+          "english": "self"
+        },
+        {
+          "kanji": "名前",
+          "hiragana": "なまえ",
+          "english": "name"
+        },
+        {
+          "kanji": "最初",
+          "hiragana": "さいしょ",
+          "english": "first"
+        },
+        {
+          "kanji": "最後",
+          "hiragana": "さいご",
+          "english": "last"
+        },
+        {
+          "kanji": "間",
+          "hiragana": "あいだ",
+          "english": "while/in between"
+        },
+        {
+          "kanji": "門",
+          "hiragana": "もん",
+          "english": "gate"
+        },
+        {
+          "kanji": "間に合う",
+          "hiragana": "まにあう",
+          "english": "to be on time"
+        },
+        {
+          "kanji": "円",
+          "hiragana": "えん",
+          "english": "yen"
+        },
+        {
+          "kanji": "駅員",
+          "hiragana": "えきいん",
+          "english": "train station attendant"
+        },
+        {
+          "kanji": "社員",
+          "hiragana": "しゃいん",
+          "english": "employee"
+        },
+        {
+          "kanji": "時間",
+          "hiragana": "じかん",
+          "english": "time"
+        },
+        {
+          "kanji": "時",
+          "hiragana": "とき",
+          "english": "moment/time"
+        },
+        {
+          "kanji": "時計",
+          "hiragana": "とけい",
+          "english": "watch/clock"
+        },
+        {
+          "kanji": "夏休み",
+          "hiragana": "なつやすみ",
+          "english": "summer vacation"
+        },
+        {
+          "kanji": "飲む",
+          "hiragana": "のむ",
+          "english": "to drink"
+        },
+        {
+          "kanji": "飲み物",
+          "hiragana": "のみもの",
+          "english": "drinks"
+        },
+        {
+          "kanji": "買う",
+          "hiragana": "かう",
+          "english": "to buy"
+        },
+        {
+          "kanji": "買い物",
+          "hiragana": "かいもの",
+          "english": "shopping"
+        },
+        {
+          "kanji": "意見",
+          "hiragana": "いけん",
+          "english": "opinion"
+        },
+        {
+          "kanji": "一度",
+          "hiragana": "いちど",
+          "english": "one time"
+        },
+        {
+          "kanji": "見る",
+          "hiragana": "みる",
+          "english": "to look/to watch/to see"
+        },
+        {
+          "kanji": "見える",
+          "hiragana": "みえる",
+          "english": "can see"
+        },
+        {
+          "kanji": "見せる",
+          "hiragana": "みせる",
+          "english": "to show"
+        },
+        {
+          "kanji": "聞く",
+          "hiragana": "きく",
+          "english": "to listen/to hear"
+        },
+        {
+          "kanji": "聞こえる",
+          "hiragana": "きこえる",
+          "english": "can hear"
+        },
+        {
+          "kanji": "新聞",
+          "hiragana": "しんぶん",
+          "english": "newspaper"
+        },
+        {
+          "kanji": "新聞社",
+          "hiragana": "しんぶんしゃ",
+          "english": "newspaper company"
+        },
+        {
+          "kanji": "食べる",
+          "hiragana": "たべる",
+          "english": "to eat"
+        },
+        {
+          "kanji": "食べ物",
+          "hiragana": "たべもの",
+          "english": "food"
+        },
+        {
+          "kanji": "食品",
+          "hiragana": "しょくひん",
+          "english": "food products"
+        },
+        {
+          "kanji": "お茶",
+          "hiragana": "おちゃ",
+          "english": "tea"
+        },
+        {
+          "kanji": "喫茶店",
+          "hiragana": "きっさてん",
+          "english": "coffee shop"
+        },
+        {
+          "kanji": "交差点",
+          "hiragana": "こうさてん",
+          "english": "crossing"
+        },
+        {
+          "kanji": "紅葉",
+          "hiragana": "こうよう",
+          "english": "leaves changing colors"
+        },
+        {
+          "kanji": "お酒",
+          "hiragana": "おさけ",
+          "english": "alcohol drinks"
+        },
+        {
+          "kanji": "肉",
+          "hiragana": "にく",
+          "english": "meat"
+        },
+        {
+          "kanji": "豚肉",
+          "hiragana": "ぶたにく",
+          "english": "pork"
+        },
+        {
+          "kanji": "とり肉",
+          "hiragana": "とりにく",
+          "english": "chicken meat"
+        },
+        {
+          "kanji": "牛肉",
+          "hiragana": "ぎゅうにく",
+          "english": "beef"
+        },
+        {
+          "kanji": "牛乳",
+          "hiragana": "ぎゅうにゅう",
+          "english": "milk"
+        },
+        {
+          "kanji": "音",
+          "hiragana": "おと",
+          "english": "sound"
+        },
+        {
+          "kanji": "音楽",
+          "hiragana": "おんがく",
+          "english": "music"
+        },
+        {
+          "kanji": "発音",
+          "hiragana": "はつおん",
+          "english": "pronunciation"
+        },
+        {
+          "kanji": "到着",
+          "hiragana": "とうちゃく",
+          "english": "arrival"
+        },
+        {
+          "kanji": "出発",
+          "hiragana": "しゅっぱつ",
+          "english": "departure"
+        },
+        {
+          "kanji": "読む",
+          "hiragana": "よむ",
+          "english": "to read"
+        },
+        {
+          "kanji": "読み方",
+          "hiragana": "よみかた",
+          "english": "way of reading"
+        },
+        {
+          "kanji": "書く",
+          "hiragana": "かく",
+          "english": "to write"
+        },
+        {
+          "kanji": "書き方",
+          "hiragana": "かきかた",
+          "english": "way of writing"
+        },
+        {
+          "kanji": "楽しい",
+          "hiragana": "たのしい",
+          "english": "enjoyable"
+        },
+        {
+          "kanji": "薬",
+          "hiragana": "くすり",
+          "english": "medicine"
+        },
+        {
+          "kanji": "花",
+          "hiragana": "はな",
+          "english": "flower"
+        },
+        {
+          "kanji": "花びん",
+          "hiragana": "かびん",
+          "english": "vase"
+        },
+        {
+          "kanji": "花見",
+          "hiragana": "はなみ",
+          "english": "flower viewing"
+        },
+        {
+          "kanji": "花火",
+          "hiragana": "はなび",
+          "english": "fireworks display"
+        },
+        {
+          "kanji": "立つ",
+          "hiragana": "たつ",
+          "english": "to stand up"
+        },
+        {
+          "kanji": "立てる",
+          "hiragana": "たてる",
+          "english": "to build/to stand up"
+        },
+        {
+          "kanji": "座る",
+          "hiragana": "すわる",
+          "english": "to sit"
+        },
+        {
+          "kanji": "傘",
+          "hiragana": "かさ",
+          "english": "umbrella"
+        },
+        {
+          "kanji": "答え",
+          "hiragana": "こたえ",
+          "english": "answer"
+        },
+        {
+          "kanji": "答える",
+          "hiragana": "こたえる",
+          "english": "to answer"
+        },
+        {
+          "kanji": "辞書",
+          "hiragana": "じしょ",
+          "english": "dictionary"
+        },
+        {
+          "kanji": "図書館",
+          "hiragana": "としょかん",
+          "english": "library"
+        },
+        {
+          "kanji": "招待する",
+          "hiragana": "しょうたいする",
+          "english": "to invite"
+        },
+        {
+          "kanji": "待つ",
+          "hiragana": "まつ",
+          "english": "to wait"
+        },
+        {
+          "kanji": "持つ",
+          "hiragana": "もつ",
+          "english": "to hold"
+        },
+        {
+          "kanji": "電話",
+          "hiragana": "でんわ",
+          "english": "telephone"
+        },
+        {
+          "kanji": "世話",
+          "hiragana": "せわ",
+          "english": "care"
+        },
+        {
+          "kanji": "映画",
+          "hiragana": "えいが",
+          "english": "movie"
+        },
+        {
+          "kanji": "映画館",
+          "hiragana": "えいがかん",
+          "english": "cinema/theater"
+        },
+        {
+          "kanji": "写す",
+          "hiragana": "うつす",
+          "english": "to film/to copy"
+        },
+        {
+          "kanji": "写真",
+          "hiragana": "しゃしん",
+          "english": "photo/picture"
+        },
+        {
+          "kanji": "計画",
+          "hiragana": "けいかく",
+          "english": "plan"
+        },
+        {
+          "kanji": "話",
+          "hiragana": "はなし",
+          "english": "talk/speech"
+        },
+        {
+          "kanji": "話す",
+          "hiragana": "はなす",
+          "english": "to speak"
+        },
+        {
+          "kanji": "英語",
+          "hiragana": "えいご",
+          "english": "English"
+        },
+        {
+          "kanji": "教室",
+          "hiragana": "きょうしつ",
+          "english": "classroom"
+        },
+        {
+          "kanji": "部屋",
+          "hiragana": "へや",
+          "english": "room"
+        },
+        {
+          "kanji": "教える",
+          "hiragana": "おしえる",
+          "english": "to teach"
+        },
+        {
+          "kanji": "教育",
+          "hiragana": "きょういく",
+          "english": "education"
+        },
+        {
+          "kanji": "練習する",
+          "hiragana": "れんしゅうする",
+          "english": "to practice"
+        },
+        {
+          "kanji": "復習する",
+          "hiragana": "ふくしゅうする",
+          "english": "to review"
+        },
+        {
+          "kanji": "習う",
+          "hiragana": "ならう",
+          "english": "to learn"
+        },
+        {
+          "kanji": "予習する",
+          "hiragana": "よしゅうする",
+          "english": "to prepare one's lesson"
+        },
+        {
+          "kanji": "貸す",
+          "hiragana": "かす",
+          "english": "to lend"
+        },
+        {
+          "kanji": "借りる",
+          "hiragana": "かりる",
+          "english": "to borrow"
+        },
+        {
+          "kanji": "送る",
+          "hiragana": "おくる",
+          "english": "to send"
+        },
+        {
+          "kanji": "本",
+          "hiragana": "ほん",
+          "english": "book"
+        },
+        {
+          "kanji": "漢字",
+          "hiragana": "かんじ",
+          "english": "Chinese character"
+        },
+        {
+          "kanji": "字",
+          "hiragana": "じ",
+          "english": "character"
+        },
+        {
+          "kanji": "友達",
+          "hiragana": "ともだち",
+          "english": "friend"
+        },
+        {
+          "kanji": "小学校",
+          "hiragana": "しょうがっこう",
+          "english": "elementary school"
+        },
+        {
+          "kanji": "小学生",
+          "hiragana": "しょうがくせい",
+          "english": "elementary student"
+        },
+        {
+          "kanji": "高校",
+          "hiragana": "こうこう",
+          "english": "high school"
+        },
+        {
+          "kanji": "高校生",
+          "hiragana": "こうこうせい",
+          "english": "high school student"
+        },
+        {
+          "kanji": "大学",
+          "hiragana": "だいがく",
+          "english": "university/college"
+        },
+        {
+          "kanji": "高い",
+          "hiragana": "たかい",
+          "english": "high/expensive"
+        },
+        {
+          "kanji": "低い",
+          "hiragana": "ひくい",
+          "english": "low"
+        },
+        {
+          "kanji": "安い",
+          "hiragana": "やすい",
+          "english": "cheap"
+        },
+        {
+          "kanji": "新しい",
+          "hiragana": "あたらしい",
+          "english": "new"
+        },
+        {
+          "kanji": "古い",
+          "hiragana": "ふるい",
+          "english": "old"
+        },
+        {
+          "kanji": "多い",
+          "hiragana": "おおい",
+          "english": "many/plenty"
+        },
+        {
+          "kanji": "少ない",
+          "hiragana": "すくない",
+          "english": "few"
+        },
+        {
+          "kanji": "少し",
+          "hiragana": "すこし",
+          "english": "a little"
+        },
+        {
+          "kanji": "大きい",
+          "hiragana": "おおきい",
+          "english": "big"
+        },
+        {
+          "kanji": "小さい",
+          "hiragana": "ちいさい",
+          "english": "small"
+        },
+        {
+          "kanji": "大人",
+          "hiragana": "おとな",
+          "english": "adult"
+        },
+        {
+          "kanji": "安心する",
+          "hiragana": "あんしんする",
+          "english": "to feel relieved"
+        },
+        {
+          "kanji": "大使館",
+          "hiragana": "たいしかん",
+          "english": "embassy"
+        },
+        {
+          "kanji": "大切(な)",
+          "hiragana": "たいせつ(な)",
+          "english": "important"
+        },
+        {
+          "kanji": "校長",
+          "hiragana": "こうちょう",
+          "english": "principal"
+        },
+        {
+          "kanji": "課長",
+          "hiragana": "かちょう",
+          "english": "section manager"
+        },
+        {
+          "kanji": "社長",
+          "hiragana": "しゃちょう",
+          "english": "company president"
+        },
+        {
+          "kanji": "長い",
+          "hiragana": "ながい",
+          "english": "long"
+        },
+        {
+          "kanji": "短い",
+          "hiragana": "みじかい",
+          "english": "short"
+        },
+        {
+          "kanji": "軽い",
+          "hiragana": "かるい",
+          "english": "light (weight)"
+        },
+        {
+          "kanji": "暗い",
+          "hiragana": "くらい",
+          "english": "dark"
+        },
+        {
+          "kanji": "暑い",
+          "hiragana": "あつい",
+          "english": "hot"
+        },
+        {
+          "kanji": "寒い",
+          "hiragana": "さむい",
+          "english": "cold"
+        },
+        {
+          "kanji": "早い",
+          "hiragana": "はやい",
+          "english": "early"
+        },
+        {
+          "kanji": "悪い",
+          "hiragana": "わるい",
+          "english": "bad"
+        },
+        {
+          "kanji": "元気(な)",
+          "hiragana": "げんき(な)",
+          "english": "healthy"
+        },
+        {
+          "kanji": "病気",
+          "hiragana": "びょうき",
+          "english": "illness"
+        },
+        {
+          "kanji": "気持ち",
+          "hiragana": "きもち",
+          "english": "feeling"
+        },
+        {
+          "kanji": "気分",
+          "hiragana": "きぶん",
+          "english": "mood/feeling"
+        },
+        {
+          "kanji": "天気",
+          "hiragana": "てんき",
+          "english": "weather"
+        },
+        {
+          "kanji": "電気",
+          "hiragana": "でんき",
+          "english": "light/electricity"
+        },
+        {
+          "kanji": "有名(な)",
+          "hiragana": "ゆうめい(な)",
+          "english": "famous"
+        },
+        {
+          "kanji": "郵便局",
+          "hiragana": "ゆうびんきょく",
+          "english": "post office"
+        },
+        {
+          "kanji": "便利な",
+          "hiragana": "べんりな",
+          "english": "convenient"
+        },
+        {
+          "kanji": "不便(な)",
+          "hiragana": "ふべん(な)",
+          "english": "inconvenient"
+        },
+        {
+          "kanji": "利用する",
+          "hiragana": "りようする",
+          "english": "to use"
+        },
+        {
+          "kanji": "研究する",
+          "hiragana": "けんきゅうする",
+          "english": "to research"
+        },
+        {
+          "kanji": "研究室",
+          "hiragana": "けんきゅうしつ",
+          "english": "research room"
+        },
+        {
+          "kanji": "研究者",
+          "hiragana": "けんきゅうしゃ",
+          "english": "researcher"
+        },
+        {
+          "kanji": "質問",
+          "hiragana": "しつもん",
+          "english": "question"
+        },
+        {
+          "kanji": "問題",
+          "hiragana": "もんだい",
+          "english": "problem"
+        },
+        {
+          "kanji": "作文",
+          "hiragana": "さくぶん",
+          "english": "composition"
+        },
+        {
+          "kanji": "文法",
+          "hiragana": "ぶんぽう",
+          "english": "grammar"
+        },
+        {
+          "kanji": "文章",
+          "hiragana": "ぶんしょう",
+          "english": "document/passage"
+        },
+        {
+          "kanji": "文化",
+          "hiragana": "ぶんか",
+          "english": "culture"
+        },
+        {
+          "kanji": "洗濯する",
+          "hiragana": "せんたくする",
+          "english": "to wash clothes"
+        },
+        {
+          "kanji": "同じ",
+          "hiragana": "おなじ",
+          "english": "same"
+        },
+        {
+          "kanji": "親切(な)",
+          "hiragana": "しんせつ(な)",
+          "english": "kind"
+        },
+        {
+          "kanji": "切る",
+          "hiragana": "きる",
+          "english": "to cut"
+        },
+        {
+          "kanji": "切れる",
+          "hiragana": "きれる",
+          "english": "to be cut/to run out"
+        },
+        {
+          "kanji": "切符",
+          "hiragana": "きっぷ",
+          "english": "ticket"
+        },
+        {
+          "kanji": "切手",
+          "hiragana": "きって",
+          "english": "stamp"
+        },
+        {
+          "kanji": "洗う",
+          "hiragana": "あらう",
+          "english": "to wash"
+        },
+        {
+          "kanji": "お手洗い",
+          "hiragana": "おてあらい",
+          "english": "toilet/washroom"
+        },
+        {
+          "kanji": "注意する",
+          "hiragana": "ちゅういする",
+          "english": "to warn/to be careful"
+        },
+        {
+          "kanji": "注射",
+          "hiragana": "ちゅうしゃ",
+          "english": "injection"
+        },
+        {
+          "kanji": "用意する",
+          "hiragana": "よういする",
+          "english": "to prepare"
+        },
+        {
+          "kanji": "意味",
+          "hiragana": "いみ",
+          "english": "meaning"
+        },
+        {
+          "kanji": "旅行する",
+          "hiragana": "りょこうする",
+          "english": "to travel"
+        },
+        {
+          "kanji": "旅館",
+          "hiragana": "りょかん",
+          "english": "Japanese inn"
+        },
+        {
+          "kanji": "言う",
+          "hiragana": "いう",
+          "english": "to say"
+        },
+        {
+          "kanji": "言葉",
+          "hiragana": "ことば",
+          "english": "words/language"
+        },
+        {
+          "kanji": "計画する",
+          "hiragana": "けいかくする",
+          "english": "to plan"
+        },
+        {
+          "kanji": "池",
+          "hiragana": "いけ",
+          "english": "pond"
+        },
+        {
+          "kanji": "洋服",
+          "hiragana": "ようふく",
+          "english": "western clothes"
+        },
+        {
+          "kanji": "洋室",
+          "hiragana": "ようしつ",
+          "english": "western-style room"
+        },
+        {
+          "kanji": "和室",
+          "hiragana": "わしつ",
+          "english": "Japanese-style room"
+        },
+        {
+          "kanji": "平和",
+          "hiragana": "へいわ",
+          "english": "peace"
+        },
+        {
+          "kanji": "時代",
+          "hiragana": "じだい",
+          "english": "era/period"
+        },
+        {
+          "kanji": "代わりに",
+          "hiragana": "かわりに",
+          "english": "instead of/in place of"
+        },
+        {
+          "kanji": "代",
+          "hiragana": "だい",
+          "english": "charge/cost/generation"
+        },
+        {
+          "kanji": "歌",
+          "hiragana": "うた",
+          "english": "song"
+        },
+        {
+          "kanji": "歌う",
+          "hiragana": "うたう",
+          "english": "to sing"
+        },
+        {
+          "kanji": "特別(な)",
+          "hiragana": "とくべつ(な)",
+          "english": "special"
+        },
+        {
+          "kanji": "特急",
+          "hiragana": "とっきゅう",
+          "english": "express train"
+        },
+        {
+          "kanji": "特に",
+          "hiragana": "とくに",
+          "english": "especially"
+        },
+        {
+          "kanji": "別に",
+          "hiragana": "べつに",
+          "english": "separately"
+        },
+        {
+          "kanji": "別",
+          "hiragana": "べつ",
+          "english": "separate/different"
+        },
+        {
+          "kanji": "集める/集まる",
+          "hiragana": "あつめる/あつまる",
+          "english": "to gather/to collect"
+        },
+        {
+          "kanji": "売る",
+          "hiragana": "うる",
+          "english": "to sell"
+        },
+        {
+          "kanji": "売り場",
+          "hiragana": "うりば",
+          "english": "selling section"
+        },
+        {
+          "kanji": "持って行く",
+          "hiragana": "もっていく",
+          "english": "to take (something)"
+        },
+        {
+          "kanji": "持って来る",
+          "hiragana": "もってくる",
+          "english": "to bring (something)"
+        },
+        {
+          "kanji": "押す",
+          "hiragana": "おす",
+          "english": "to press/to push"
+        },
+        {
+          "kanji": "引く",
+          "hiragana": "ひく",
+          "english": "to pull"
+        },
+        {
+          "kanji": "引き出し",
+          "hiragana": "ひきだし",
+          "english": "drawer"
+        },
+        {
+          "kanji": "引っ越し",
+          "hiragana": "ひっこし",
+          "english": "moving to another house"
+        },
+        {
+          "kanji": "紙",
+          "hiragana": "かみ",
+          "english": "paper"
+        },
+        {
+          "kanji": "手紙",
+          "hiragana": "てがみ",
+          "english": "letter"
+        },
+        {
+          "kanji": "服",
+          "hiragana": "ふく",
+          "english": "clothes"
+        },
+        {
+          "kanji": "和服",
+          "hiragana": "わふく",
+          "english": "Japanese clothes"
+        },
+        {
+          "kanji": "取る",
+          "hiragana": "とる",
+          "english": "to take"
+        },
+        {
+          "kanji": "専門",
+          "hiragana": "せんもん",
+          "english": "specialty"
+        },
+        {
+          "kanji": "開ける",
+          "hiragana": "あける",
+          "english": "to open"
+        },
+        {
+          "kanji": "開く",
+          "hiragana": "ひらく",
+          "english": "to open"
+        },
+        {
+          "kanji": "閉まる/閉める",
+          "hiragana": "しまる/しめる",
+          "english": "to close"
+        },
+        {
+          "kanji": "駅",
+          "hiragana": "えき",
+          "english": "train station"
+        },
+        {
+          "kanji": "入院する",
+          "hiragana": "にゅういんする",
+          "english": "to be hospitalized"
+        },
+        {
+          "kanji": "退院する",
+          "hiragana": "たいいんする",
+          "english": "to be discharged"
+        },
+        {
+          "kanji": "大学院",
+          "hiragana": "だいがくいん",
+          "english": "graduate school"
+        },
+        {
+          "kanji": "店",
+          "hiragana": "みせ",
+          "english": "shop"
+        },
+        {
+          "kanji": "遠い",
+          "hiragana": "とおい",
+          "english": "far"
+        },
+        {
+          "kanji": "遠足",
+          "hiragana": "えんそく",
+          "english": "outing/excursion"
+        },
+        {
+          "kanji": "遠く",
+          "hiragana": "とおく",
+          "english": "far (distance)"
+        },
+        {
+          "kanji": "建物",
+          "hiragana": "たてもの",
+          "english": "building"
+        },
+        {
+          "kanji": "場合",
+          "hiragana": "ばあい",
+          "english": "case/situation"
+        },
+        {
+          "kanji": "食堂",
+          "hiragana": "しょくどう",
+          "english": "cafeteria/dining room"
+        },
+        {
+          "kanji": "二階建て",
+          "hiragana": "にかいだて",
+          "english": "two-storey building"
+        },
+        {
+          "kanji": "動物園",
+          "hiragana": "どうぶつえん",
+          "english": "zoo"
+        },
+        {
+          "kanji": "動物",
+          "hiragana": "どうぶつ",
+          "english": "animals"
+        },
+        {
+          "kanji": "荷物",
+          "hiragana": "にもつ",
+          "english": "luggage"
+        },
+        {
+          "kanji": "物",
+          "hiragana": "もの",
+          "english": "thing"
+        },
+        {
+          "kanji": "乗り物",
+          "hiragana": "のりもの",
+          "english": "vehicle"
+        },
+        {
+          "kanji": "工場",
+          "hiragana": "こうじょう",
+          "english": "factory"
+        },
+        {
+          "kanji": "工業",
+          "hiragana": "こうぎょう",
+          "english": "industry"
+        },
+        {
+          "kanji": "場所",
+          "hiragana": "ばしょ",
+          "english": "place"
+        },
+        {
+          "kanji": "駐車場",
+          "hiragana": "ちゅうしゃじょう",
+          "english": "parking area"
+        },
+        {
+          "kanji": "地図",
+          "hiragana": "ちず",
+          "english": "map"
+        },
+        {
+          "kanji": "美術館",
+          "hiragana": "びじゅつかん",
+          "english": "art museum"
+        },
+        {
+          "kanji": "地震",
+          "hiragana": "じしん",
+          "english": "earthquake"
+        },
+        {
+          "kanji": "東京",
+          "hiragana": "とうきょう",
+          "english": "Tokyo"
+        },
+        {
+          "kanji": "西洋",
+          "hiragana": "せいよう",
+          "english": "western country"
+        },
+        {
+          "kanji": "大阪",
+          "hiragana": "おおさか",
+          "english": "Osaka"
+        },
+        {
+          "kanji": "北海道",
+          "hiragana": "ほっかいどう",
+          "english": "Hokkaido"
+        },
+        {
+          "kanji": "京都",
+          "hiragana": "きょうと",
+          "english": "Kyoto"
+        },
+        {
+          "kanji": "世界",
+          "hiragana": "せかい",
+          "english": "world"
+        },
+        {
+          "kanji": "外国",
+          "hiragana": "がいこく",
+          "english": "foreign country"
+        },
+        {
+          "kanji": "外国人",
+          "hiragana": "がいこくじん",
+          "english": "foreigner"
+        },
+        {
+          "kanji": "外国語",
+          "hiragana": "がいこくご",
+          "english": "foreign language"
+        },
+        {
+          "kanji": "国際",
+          "hiragana": "こくさい",
+          "english": "international"
+        },
+        {
+          "kanji": "国",
+          "hiragana": "くに",
+          "english": "country"
+        },
+        {
+          "kanji": "海外",
+          "hiragana": "かいがい",
+          "english": "abroad"
+        },
+        {
+          "kanji": "海",
+          "hiragana": "うみ",
+          "english": "sea"
+        },
+        {
+          "kanji": "東京都",
+          "hiragana": "とうきょうと",
+          "english": "Tokyo metropolis"
+        },
+        {
+          "kanji": "道具",
+          "hiragana": "どうぐ",
+          "english": "tools"
+        },
+        {
+          "kanji": "道",
+          "hiragana": "みち",
+          "english": "road"
+        },
+        {
+          "kanji": "柔道",
+          "hiragana": "じゅうどう",
+          "english": "Judo"
+        },
+        {
+          "kanji": "所",
+          "hiragana": "ところ",
+          "english": "place"
+        },
+        {
+          "kanji": "事務所",
+          "hiragana": "じむしょ",
+          "english": "office"
+        },
+        {
+          "kanji": "台所",
+          "hiragana": "だいどころ",
+          "english": "kitchen"
+        },
+        {
+          "kanji": "運転",
+          "hiragana": "うんてん",
+          "english": "driving"
+        },
+        {
+          "kanji": "運転手",
+          "hiragana": "うんてんしゅ",
+          "english": "driver"
+        },
+        {
+          "kanji": "足りる",
+          "hiragana": "たりる",
+          "english": "to be enough"
+        },
+        {
+          "kanji": "足す",
+          "hiragana": "たす",
+          "english": "to add"
+        },
+        {
+          "kanji": "人口",
+          "hiragana": "じんこう",
+          "english": "population"
+        },
+        {
+          "kanji": "出口",
+          "hiragana": "でぐち",
+          "english": "exit"
+        },
+        {
+          "kanji": "入口",
+          "hiragana": "いりぐち",
+          "english": "entrance"
+        },
+        {
+          "kanji": "野菜",
+          "hiragana": "やさい",
+          "english": "vegetable"
+        },
+        {
+          "kanji": "心配する",
+          "hiragana": "しんぱいする",
+          "english": "to worry"
+        },
+        {
+          "kanji": "熱心な",
+          "hiragana": "ねっしんな",
+          "english": "eager"
+        },
+        {
+          "kanji": "死ぬ",
+          "hiragana": "しぬ",
+          "english": "to die"
+        },
+        {
+          "kanji": "乗る",
+          "hiragana": "のる",
+          "english": "to ride"
+        },
+        {
+          "kanji": "乗り換える",
+          "hiragana": "のりかえる",
+          "english": "to transfer/change vehicle"
+        },
+        {
+          "kanji": "力",
+          "hiragana": "ちから",
+          "english": "strength"
+        },
+        {
+          "kanji": "台風",
+          "hiragana": "たいふう",
+          "english": "typhoon"
+        },
+        {
+          "kanji": "風呂",
+          "hiragana": "おふろ",
+          "english": "bathtub"
+        },
+        {
+          "kanji": "風",
+          "hiragana": "かぜ",
+          "english": "wind"
+        },
+        {
+          "kanji": "風邪",
+          "hiragana": "かぜ",
+          "english": "cold (illness)"
+        },
+        {
+          "kanji": "声",
+          "hiragana": "こえ",
+          "english": "voice"
+        },
+        {
+          "kanji": "医者",
+          "hiragana": "いしゃ",
+          "english": "doctor"
+        },
+        {
+          "kanji": "歯医者",
+          "hiragana": "はいしゃ",
+          "english": "dentist"
+        },
+        {
+          "kanji": "医学",
+          "hiragana": "いがく",
+          "english": "medicine (field)"
+        },
+        {
+          "kanji": "ご飯",
+          "hiragana": "ごはん",
+          "english": "cooked rice"
+        },
+        {
+          "kanji": "朝ご飯",
+          "hiragana": "あさごはん",
+          "english": "breakfast"
+        },
+        {
+          "kanji": "昼ご飯",
+          "hiragana": "ひるごはん",
+          "english": "lunch"
+        },
+        {
+          "kanji": "晩ご飯",
+          "hiragana": "ばんごはん",
+          "english": "dinner"
+        },
+        {
+          "kanji": "夕飯",
+          "hiragana": "ゆうはん",
+          "english": "dinner"
+        },
+        {
+          "kanji": "降りる",
+          "hiragana": "おりる",
+          "english": "to get off"
+        },
+        {
+          "kanji": "降る",
+          "hiragana": "ふる",
+          "english": "to fall (rain/snow)"
+        },
+        {
+          "kanji": "散歩する",
+          "hiragana": "さんぽする",
+          "english": "to take a walk"
+        },
+        {
+          "kanji": "歩く",
+          "hiragana": "あるく",
+          "english": "to walk"
+        },
+        {
+          "kanji": "止まる/止める",
+          "hiragana": "とまる/とめる",
+          "english": "to stop"
+        },
+        {
+          "kanji": "自転車",
+          "hiragana": "じてんしゃ",
+          "english": "bicycle"
+        },
+        {
+          "kanji": "自動車",
+          "hiragana": "じどうしゃ",
+          "english": "automobile"
+        },
+        {
+          "kanji": "自由",
+          "hiragana": "じゆう",
+          "english": "freedom/freely"
+        },
+        {
+          "kanji": "運動",
+          "hiragana": "うんどう",
+          "english": "exercise"
+        },
+        {
+          "kanji": "運ぶ",
+          "hiragana": "はこぶ",
+          "english": "to carry"
+        },
+        {
+          "kanji": "出す",
+          "hiragana": "だす",
+          "english": "to put out/to submit"
+        },
+        {
+          "kanji": "出かける",
+          "hiragana": "でかける",
+          "english": "to go out"
+        },
+        {
+          "kanji": "着く",
+          "hiragana": "つく",
+          "english": "to arrive"
+        },
+        {
+          "kanji": "着物",
+          "hiragana": "きもの",
+          "english": "kimono"
+        },
+        {
+          "kanji": "交通",
+          "hiragana": "こうつう",
+          "english": "traffic/transportation"
+        },
+        {
+          "kanji": "通る",
+          "hiragana": "とおる",
+          "english": "to pass through"
+        },
+        {
+          "kanji": "通う",
+          "hiragana": "かよう",
+          "english": "to attend/to commute"
+        },
+        {
+          "kanji": "普通",
+          "hiragana": "ふつう",
+          "english": "normal/usual"
+        },
+        {
+          "kanji": "通り",
+          "hiragana": "とおり",
+          "english": "street/road"
+        },
+        {
+          "kanji": "入学する",
+          "hiragana": "にゅうがくする",
+          "english": "to enter university/school"
+        },
+        {
+          "kanji": "輸入する",
+          "hiragana": "ゆにゅうする",
+          "english": "to import"
+        },
+        {
+          "kanji": "輸出する",
+          "hiragana": "ゆしゅつする",
+          "english": "to export"
+        },
+        {
+          "kanji": "入れる",
+          "hiragana": "いれる",
+          "english": "to insert/to put in"
+        },
+        {
+          "kanji": "入る",
+          "hiragana": "はいる",
+          "english": "to enter"
+        },
+        {
+          "kanji": "出る",
+          "hiragana": "でる",
+          "english": "to go out/to leave"
+        },
+        {
+          "kanji": "急に",
+          "hiragana": "きゅうに",
+          "english": "suddenly"
+        },
+        {
+          "kanji": "急ぐ",
+          "hiragana": "いそぐ",
+          "english": "to hurry"
+        },
+        {
+          "kanji": "番号",
+          "hiragana": "ばんごう",
+          "english": "number"
+        },
+        {
+          "kanji": "番組",
+          "hiragana": "ばんぐみ",
+          "english": "channel/program"
+        },
+        {
+          "kanji": "交番",
+          "hiragana": "こうばん",
+          "english": "police box"
+        },
+        {
+          "kanji": "番",
+          "hiragana": "ばん",
+          "english": "number/turn"
+        },
+        {
+          "kanji": "信号",
+          "hiragana": "しんごう",
+          "english": "traffic light"
+        },
+        {
+          "kanji": "回る",
+          "hiragana": "まわる",
+          "english": "to turn/to go around"
+        },
+        {
+          "kanji": "作る",
+          "hiragana": "つくる",
+          "english": "to make"
+        },
+        {
+          "kanji": "使う",
+          "hiragana": "つかう",
+          "english": "to use"
+        },
+        {
+          "kanji": "考える",
+          "hiragana": "かんがえる",
+          "english": "to think"
+        },
+        {
+          "kanji": "思う",
+          "hiragana": "おもう",
+          "english": "to think/to feel"
+        },
+        {
+          "kanji": "思い出す",
+          "hiragana": "おもいだす",
+          "english": "to remember"
+        },
+        {
+          "kanji": "知る",
+          "hiragana": "しる",
+          "english": "to know"
+        },
+        {
+          "kanji": "知らせる",
+          "hiragana": "しらせる",
+          "english": "to notify/to inform"
+        },
+        {
+          "kanji": "理由",
+          "hiragana": "りゆう",
+          "english": "reason"
+        },
+        {
+          "kanji": "品質",
+          "hiragana": "ひんしつ",
+          "english": "quality"
+        },
+        {
+          "kanji": "食料品",
+          "hiragana": "しょくりょうひん",
+          "english": "food products"
+        },
+        {
+          "kanji": "興味",
+          "hiragana": "きょうみ",
+          "english": "interest"
+        },
+        {
+          "kanji": "授業",
+          "hiragana": "じゅぎょう",
+          "english": "class/lesson"
+        },
+        {
+          "kanji": "産業",
+          "hiragana": "さんぎょう",
+          "english": "industry"
+        },
+        {
+          "kanji": "卒業",
+          "hiragana": "そつぎょう",
+          "english": "graduation"
+        },
+        {
+          "kanji": "宿題",
+          "hiragana": "しゅくだい",
+          "english": "assignment/homework"
+        },
+        {
+          "kanji": "試験",
+          "hiragana": "しけん",
+          "english": "exam"
+        },
+        {
+          "kanji": "試合",
+          "hiragana": "しあい",
+          "english": "match/game"
+        },
+        {
+          "kanji": "経験",
+          "hiragana": "けいけん",
+          "english": "experience"
+        },
+        {
+          "kanji": "合う",
+          "hiragana": "あう",
+          "english": "to fit/to match"
+        },
+        {
+          "kanji": "料理",
+          "hiragana": "りょうり",
+          "english": "dish/cooking"
+        },
+        {
+          "kanji": "地理",
+          "hiragana": "ちり",
+          "english": "geography"
+        },
+        {
+          "kanji": "味",
+          "hiragana": "あじ",
+          "english": "taste"
+        },
+        {
+          "kanji": "趣味",
+          "hiragana": "しゅみ",
+          "english": "hobbies"
+        },
+        {
+          "kanji": "天気予報",
+          "hiragana": "てんきよほう",
+          "english": "weather forecast"
+        },
+        {
+          "kanji": "空",
+          "hiragana": "そら",
+          "english": "sky"
+        },
+        {
+          "kanji": "田舎",
+          "hiragana": "いなか",
+          "english": "countryside/province"
+        },
+        {
+          "kanji": "以下",
+          "hiragana": "いか",
+          "english": "less than/below"
+        },
+        {
+          "kanji": "以内",
+          "hiragana": "いない",
+          "english": "within"
+        },
+        {
+          "kanji": "以外",
+          "hiragana": "いがい",
+          "english": "except/other than"
+        },
+        {
+          "kanji": "安全(な)",
+          "hiragana": "あんぜん(な)",
+          "english": "safe"
+        },
+        {
+          "kanji": "全然",
+          "hiragana": "ぜんぜん",
+          "english": "not at all"
+        },
+        {
+          "kanji": "全部",
+          "hiragana": "ぜんぶ",
+          "english": "all"
+        },
+        {
+          "kanji": "説明する",
+          "hiragana": "せつめいする",
+          "english": "to explain"
+        },
+        {
+          "kanji": "小説",
+          "hiragana": "しょうせつ",
+          "english": "novel"
+        }
+      ]
+    }
+  ]
+}

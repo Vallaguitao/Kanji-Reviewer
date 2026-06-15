@@ -42,10 +42,42 @@ const App = (() => {
   // ─── Router ────────────────────────────────────────────────
 
   function init() {
+    initTheme();
     if (typeof KanjiHelper !== 'undefined') KanjiHelper.init();
     window.addEventListener('hashchange', handleRoute);
     handleRoute();
     Storage.updateStreak();
+  }
+
+  function initTheme() {
+    const toggleBtn = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('n5vocab_theme');
+    
+    let isDark = savedTheme === 'dark';
+    if (savedTheme === null) {
+      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    
+    document.body.classList.toggle('dark', isDark);
+    updateToggleIcon(isDark);
+    
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        isDark = !document.body.classList.contains('dark');
+        document.body.classList.toggle('dark', isDark);
+        localStorage.setItem('n5vocab_theme', isDark ? 'dark' : 'light');
+        updateToggleIcon(isDark);
+      };
+    }
+  }
+
+  function updateToggleIcon(isDark) {
+    const toggleBtn = document.getElementById('theme-toggle');
+    if (!toggleBtn) return;
+    const iconSpan = toggleBtn.querySelector('.theme-toggle-icon');
+    if (iconSpan) {
+      iconSpan.textContent = isDark ? '☀️' : '🌙';
+    }
   }
 
   function handleRoute() {
@@ -334,14 +366,12 @@ const App = (() => {
 
     container.innerHTML = `
       <div class="dashboard">
-        <div class="sakura-container" aria-hidden="true">
-          ${Array.from({length: 10}, (_, i) => `<div class="sakura-petal"></div>`).join('')}
-        </div>
+
 
         <div class="dashboard-header">
           <h1 class="dashboard-title">
             <span class="title-jp">漢字マスター</span>
-            <span class="title-en">N5 Vocabulary</span>
+            <span class="title-en">Kanji Reviewer</span>
           </h1>
           ${streak.currentStreak > 0 ? `
             <div class="streak-badge" title="Study streak">
@@ -1240,44 +1270,124 @@ const App = (() => {
     let currentDetailChar = null;
 
     function renderBrowse() {
+      const KANJI_CATEGORIES = KanjiHelper.KANJI_CATEGORIES;
+      
+      // Group kanjiList by category
+      const grouped = {};
+      for (const catId of Object.keys(KANJI_CATEGORIES)) {
+        grouped[catId] = [];
+      }
+      for (const k of kanjiList) {
+        const cat = k.category || 'general_other';
+        if (grouped[cat]) {
+          grouped[cat].push(k);
+        } else {
+          grouped['general_other'].push(k);
+        }
+      }
+
+      // Generate HTML for Accordion
+      let accordionHtml = '';
+      let isFirst = true;
+
+      for (const [catId, catMeta] of Object.entries(KANJI_CATEGORIES)) {
+        const catKanji = grouped[catId] || [];
+        if (catKanji.length === 0) continue; // Skip empty categories
+
+        accordionHtml += `
+          <div class="kanji-accordion-item washi-card">
+            <div class="kanji-accordion-header ${isFirst ? 'open' : ''}" data-category="${catId}">
+              <span class="kanji-accordion-icon">${catMeta.icon}</span>
+              <span class="kanji-accordion-title">${catMeta.name}</span>
+              <span class="kanji-accordion-count">${catKanji.length}</span>
+              <span class="kanji-accordion-arrow">▼</span>
+            </div>
+            <div class="kanji-accordion-body kanji-grid" id="accordion-body-${catId}" style="display: ${isFirst ? 'grid' : 'none'};">
+              ${catKanji.map(k => {
+                const mastery = Storage.getKanjiMasteryLevel(k.character);
+                return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
+              }).join('')}
+            </div>
+          </div>
+        `;
+        isFirst = false;
+      }
+
       container.innerHTML = `
         <div class="categories-view">
-          <div class="view-header">
-            <h1>漢 Kanji Study</h1>
-            <p class="view-subtitle">${KanjiHelper.getKanjiCount()} unique kanji characters from N5 vocabulary</p>
+          <div id="kanji-browse-container">
+            <div class="view-header">
+              <h1>漢 Kanji Study</h1>
+              <p class="view-subtitle">${KanjiHelper.getKanjiCount()} unique kanji characters from N5 vocabulary</p>
+            </div>
+            ${renderInstructions('About Kanji Study', [
+              'Browse all kanji characters found in the N5 vocabulary grouped by category',
+              'Click any accordion header to expand or collapse that semantic category',
+              'Click any kanji card to see its readings, meanings, and source words',
+              'Use the search bar to find specific kanji characters instantly',
+            ])}
+            <div class="search-bar-container">
+              <input type="text" id="kanji-search" class="search-input" placeholder="Search kanji by character, reading, or meaning..." autocomplete="off" />
+            </div>
+
+            <!-- Flat Grid for Search Results (hidden by default) -->
+            <div class="search-results-container" id="search-results-container" style="display: none;">
+              <h2 class="search-results-title">Search Results</h2>
+              <div class="kanji-grid" id="search-results-grid"></div>
+            </div>
+
+            <!-- Accordion List (shown by default) -->
+            <div class="kanji-accordion-list" id="kanji-accordion-list">
+              ${accordionHtml}
+            </div>
           </div>
-          ${renderInstructions('About Kanji Study', [
-            'Browse all kanji characters found in the N5 vocabulary',
-            'Click any kanji card to see its details, readings, and example words',
-            'Use the search bar to find specific kanji by character, reading, or meaning',
-            'Kanji with more associated words appear first',
-          ])}
-          <div class="search-bar-container">
-            <input type="text" id="kanji-search" class="search-input" placeholder="Search kanji by character, reading, or meaning..." autocomplete="off" />
-          </div>
-          <div class="kanji-grid" id="kanji-grid">
-            ${kanjiList.map(k => {
-              const mastery = Storage.getKanjiMasteryLevel(k.character);
-              return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
-            }).join('')}
-          </div>
+
           <div id="kanji-detail-panel" style="display:none;"></div>
         </div>
       `;
 
-      document.getElementById('kanji-grid').addEventListener('click', e => {
+      // Event listener for clicking kanji cards inside any grid
+      container.addEventListener('click', e => {
         const card = e.target.closest('.kanji-card');
         if (card) showKanjiDetail(card.dataset.char);
       });
 
-      document.getElementById('kanji-search').addEventListener('input', e => {
+      // Accordion toggle handler
+      document.querySelectorAll('.kanji-accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const catId = header.dataset.category;
+          const body = document.getElementById(`accordion-body-${catId}`);
+          const isOpen = body.style.display === 'grid';
+          body.style.display = isOpen ? 'none' : 'grid';
+          header.classList.toggle('open', !isOpen);
+        });
+      });
+
+      // Search handler
+      const searchInput = document.getElementById('kanji-search');
+      const searchResultsContainer = document.getElementById('search-results-container');
+      const searchResultsGrid = document.getElementById('search-results-grid');
+      const accordionList = document.getElementById('kanji-accordion-list');
+
+      searchInput.addEventListener('input', e => {
         const query = e.target.value.trim();
-        const results = query ? KanjiHelper.searchKanji(query) : kanjiList;
-        const grid = document.getElementById('kanji-grid');
-        grid.innerHTML = results.map(k => {
-          const mastery = Storage.getKanjiMasteryLevel(k.character);
-          return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
-        }).join('');
+        if (query) {
+          const results = KanjiHelper.searchKanji(query);
+          accordionList.style.display = 'none';
+          searchResultsContainer.style.display = 'block';
+          
+          if (results.length > 0) {
+            searchResultsGrid.innerHTML = results.map(k => {
+              const mastery = Storage.getKanjiMasteryLevel(k.character);
+              return `<div class="kanji-card ${mastery}" data-char="${k.character}" title="${k.meanings.slice(0, 2).join(', ')}">${k.character}</div>`;
+            }).join('');
+          } else {
+            searchResultsGrid.innerHTML = '<div class="empty-state-simple">No matching kanji found.</div>';
+          }
+        } else {
+          searchResultsContainer.style.display = 'none';
+          accordionList.style.display = 'block';
+        }
       });
     }
 
@@ -1286,9 +1396,9 @@ const App = (() => {
       if (!detail) return;
       currentDetailChar = char;
 
-      const grid = document.getElementById('kanji-grid');
+      const browseContainer = document.getElementById('kanji-browse-container');
       const panel = document.getElementById('kanji-detail-panel');
-      grid.style.display = 'none';
+      browseContainer.style.display = 'none';
       panel.style.display = '';
 
       const mastery = Storage.getKanjiMasteryLevel(char);
@@ -1318,7 +1428,7 @@ const App = (() => {
 
       document.getElementById('back-to-kanji').addEventListener('click', () => {
         panel.style.display = 'none';
-        grid.style.display = '';
+        browseContainer.style.display = '';
         currentDetailChar = null;
       });
     }

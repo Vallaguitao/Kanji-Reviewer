@@ -28,6 +28,17 @@ const KanjiHelper = (() => {
   /** Test whether a string contains at least one kanji character. */
   const HAS_KANJI = /[\u4E00-\u9FFF]/;
 
+  /** Semantic categories for Kanji study. */
+  const KANJI_CATEGORIES = {
+    numbers_time:           { name: 'Numbers & Time',          icon: '🔢', color: 'hsl(45, 90%, 60%)' },
+    nature_elements:        { name: 'Nature & Elements',       icon: '🌳', color: 'hsl(140, 35%, 28%)' },
+    people_body:            { name: 'People & Body',           icon: '👥', color: 'hsl(0, 45%, 40%)' },
+    directions_places:      { name: 'Directions & Places',     icon: '🗺️', color: 'hsl(210, 25%, 35%)' },
+    actions_verbs:          { name: 'Actions & Verbs',         icon: '🏃', color: 'hsl(340, 85%, 30%)' },
+    descriptive_adjectives: { name: 'Descriptive & Adjectives',icon: '🎨', color: 'hsl(270, 60%, 50%)' },
+    general_other:          { name: 'General & Other',         icon: '🏷️', color: 'hsl(220, 60%, 50%)' }
+  };
+
   // ─── Private Helpers ────────────────────────────────────────
 
   /**
@@ -142,6 +153,7 @@ const KanjiHelper = (() => {
         meanings:  [...data.meanings],
         words:     data.words,
         wordCount: data.words.length,
+        category:  _classifyKanji(character, data.meanings),
       };
       kanjiList.push(obj);
       kanjiMap.set(character, obj);
@@ -149,6 +161,46 @@ const KanjiHelper = (() => {
 
     // Sort by frequency: most associated words first
     kanjiList.sort((a, b) => b.wordCount - a.wordCount);
+  }
+
+  /**
+   * Automatically classify a kanji character into a semantic category based on its meanings.
+   * @param {string} char
+   * @param {Set<string>} meaningsSet
+   * @returns {string} Category ID.
+   */
+  function _classifyKanji(char, meaningsSet) {
+    const mStr = [...meaningsSet].join(' ').toLowerCase();
+
+    // Hardcoded checks for high-frequency basic numbers/directions
+    const numbers = '一二三四五六七八九十零百千万';
+    if (numbers.includes(char)) return 'numbers_time';
+
+    const directions = '東西南北上下左右中外';
+    if (directions.includes(char)) return 'directions_places';
+
+    const numTimeKeys = ['second', 'minute', 'hour', 'day', 'month', 'year', 'week', 'time', 'clock', 'date', 'calendar', 'noon', 'morning', 'evening', 'night', 'yesterday', 'tomorrow', 'season'];
+    const natureKeys = ['mountain', 'river', 'tree', 'wood', 'fire', 'water', 'gold', 'earth', 'soil', 'wind', 'rain', 'sky', 'cloud', 'element', 'sea', 'ocean', 'flower', 'grass', 'stone', 'rock', 'snow', 'sun', 'moon', 'nature', 'pond', 'lake', 'dog', 'cat', 'bird', 'fish', 'animal'];
+    const peopleKeys = ['person', 'people', 'child', 'father', 'mother', 'brother', 'sister', 'he', 'she', 'i', 'me', 'you', 'we', 'they', 'man', 'woman', 'hand', 'eye', 'mouth', 'ear', 'foot', 'leg', 'body', 'voice', 'tooth', 'nose', 'face', 'head', 'heart', 'friend', 'teacher', 'doctor', 'student', 'wife', 'husband', 'family', 'parents', 'son', 'daughter'];
+    const dirPlaceKeys = ['east', 'west', 'south', 'north', 'left', 'right', 'up', 'down', 'inside', 'outside', 'middle', 'between', 'front', 'back', 'behind', 'place', 'location', 'station', 'shop', 'store', 'country', 'town', 'city', 'street', 'road', 'bridge', 'school', 'house', 'room', 'garden', 'hospital', 'park', 'airport', 'building', 'side', 'corner'];
+    const actionKeys = ['go', 'come', 'eat', 'drink', 'see', 'hear', 'write', 'read', 'speak', 'talk', 'buy', 'meet', 'stand', 'enter', 'exit', 'walk', 'run', 'do', 'make', 'take', 'give', 'receive', 'sleep', 'study', 'work', 'travel', 'sing', 'wash', 'play', 'think', 'stop', 'use', 'teach', 'die', 'close', 'open', 'call'];
+    const descKeys = ['big', 'small', 'long', 'short', 'tall', 'high', 'low', 'cheap', 'expensive', 'new', 'old', 'white', 'black', 'red', 'blue', 'yellow', 'green', 'good', 'bad', 'hot', 'cold', 'warm', 'cool', 'clean', 'dirty', 'easy', 'difficult', 'important', 'convenient', 'safe', 'busy', 'heavy', 'light', 'same', 'special'];
+
+    const match = (keys) => {
+      return keys.some(k => {
+        const regex = new RegExp('\\b' + k + '\\b');
+        return regex.test(mStr);
+      });
+    };
+
+    if (match(numTimeKeys)) return 'numbers_time';
+    if (match(natureKeys)) return 'nature_elements';
+    if (match(peopleKeys)) return 'people_body';
+    if (match(dirPlaceKeys)) return 'directions_places';
+    if (match(actionKeys)) return 'actions_verbs';
+    if (match(descKeys)) return 'descriptive_adjectives';
+
+    return 'general_other';
   }
 
   // ─── Public Methods ─────────────────────────────────────────
@@ -295,5 +347,6 @@ const KanjiHelper = (() => {
     getKanjiCount,
     getKanjiQuizPool,
     searchKanji,
+    KANJI_CATEGORIES,
   };
 })();

@@ -3,19 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>漢字マスター — JLPT N5 Vocabulary Trainer</title>
-  <meta name="description" content="Master JLPT N5 vocabulary with flashcards, quizzes, typing practice, matching games, and spaced repetition. 800+ Japanese words with progress tracking." />
+  <title>漢字マスター — Vocabulary & Kanji Trainer</title>
+  <meta name="description" content="Master vocabulary & Kanji with flashcards, quizzes, typing practice, matching games, and spaced repetition. 1000+ Japanese words with progress tracking." />
   <meta name="theme-color" content="#1a1a2e" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Styles -->
   <link rel="stylesheet" href="index.css" />
 </head>
 <body>
+  <!-- Sumi-e background decorations (Ink splatters & Drifting fog) -->
+  <div class="sumie-bg-container" aria-hidden="true">
+    <div class="sumie-fog-1"></div>
+    <div class="sumie-fog-2"></div>
+    <div class="sumie-ink-splatter sumie-splatter-1"></div>
+    <div class="sumie-ink-splatter sumie-splatter-2"></div>
+    <div class="sumie-ink-splatter sumie-splatter-3"></div>
+  </div>
+
   <div class="app-container" id="app">
     <!-- Navigation -->
     <nav class="nav" id="main-nav">
@@ -66,6 +75,10 @@
           <span class="nav-text">Browse</span>
         </a>
       </div>
+
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">
+        <span class="theme-toggle-icon">☯</span>
+      </button>
     </nav>
 
     <!-- Main Content -->
