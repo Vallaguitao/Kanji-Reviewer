@@ -4283,3 +4283,239 @@ body.dark .search-results-container::after {
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   KANJI WRITING PRACTICE
+   ═══════════════════════════════════════════════════════════ */
+
+.kanji-writing-view {
+  max-width: 900px;
+  margin: 0 auto;
+  animation: scaleIn 0.3s ease;
+}
+
+.kanji-writing-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+@media (max-width: 767px) {
+  .kanji-writing-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kanji-writing-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.kanji-info-card {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.kanji-info-char {
+  font-family: var(--font-jp);
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--text-kanji);
+  line-height: 1.1;
+  margin-bottom: var(--space-sm);
+  text-shadow: 0 0 24px var(--accent-sakura-glow);
+}
+
+.kanji-info-meta {
+  width: 100%;
+}
+
+.kanji-info-readings,
+.kanji-info-meanings {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-top: var(--space-sm);
+  text-align: left;
+  line-height: 1.4;
+}
+
+.kanji-controls-card {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.btn-block {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
+
+.kanji-canvas-card {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 450px;
+}
+
+.canvas-phase-indicator {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.phase-badge {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-base);
+  user-select: none;
+}
+
+.phase-badge.active {
+  color: #fff;
+  background: var(--accent-sakura);
+  border-color: var(--accent-sakura);
+  box-shadow: var(--shadow-glow-sakura);
+}
+
+.kanji-canvas-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  background-color: var(--bg-primary);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+/* Washi paper background texture simulation */
+.kanji-canvas-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.12;
+  background-image: radial-gradient(var(--text-secondary) 0.5px, transparent 0.5px),
+                    radial-gradient(var(--text-secondary) 0.5px, var(--bg-primary) 0.5px);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.dark .kanji-canvas-wrapper::before {
+  opacity: 0.04;
+}
+
+#kanji-writer-target {
+  width: 300px;
+  height: 300px;
+  z-index: 2;
+  cursor: crosshair;
+}
+
+.canvas-transition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--transition-base);
+  border-radius: var(--radius-md);
+}
+
+.transition-box {
+  text-align: center;
+  padding: var(--space-md) var(--space-sm);
+  max-width: 290px;
+}
+
+.transition-icon {
+  font-size: 2.2rem;
+  margin-bottom: var(--space-xs);
+  animation: bounce 1.5s infinite;
+}
+
+.transition-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-kanji);
+  margin-bottom: var(--space-xs);
+}
+
+.transition-countdown {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  margin: var(--space-sm) 0;
+}
+
+.victory-actions {
+  display: flex;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.victory-back-link {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-top: var(--space-sm);
+  display: inline-block;
+  transition: color var(--transition-fast);
+}
+
+.victory-back-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.kanji-writing-feedback {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: center;
+  min-height: 24px;
+  transition: color var(--transition-fast);
+  margin-top: var(--space-sm);
+  padding: 0 var(--space-md);
+}
+
+.kanji-writing-feedback.success {
+  color: var(--accent-success);
+}
+
+.kanji-writing-feedback.error {
+  color: var(--accent-error);
+}
+

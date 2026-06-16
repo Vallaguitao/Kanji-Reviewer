@@ -82,7 +82,17 @@ const App = (() => {
 
   function handleRoute() {
     const hash = window.location.hash || '#/dashboard';
-    const path = hash.replace('#/', '') || 'dashboard';
+    const cleanHash = hash.replace('#/', '');
+    const [pathPart, queryPart] = cleanHash.split('?');
+    const path = pathPart || 'dashboard';
+
+    const queryParams = {};
+    if (queryPart) {
+      queryPart.split('&').forEach(param => {
+        const [key, val] = param.split('=');
+        queryParams[key] = decodeURIComponent(val || '');
+      });
+    }
 
     if (currentCleanup) {
       currentCleanup();
@@ -99,7 +109,7 @@ const App = (() => {
     app.classList.add('view-enter');
 
     // Track mode usage (not for dashboard/categories/kanji browse)
-    if (['flashcards', 'quiz', 'typing', 'matching', 'srs'].includes(path)) {
+    if (['flashcards', 'quiz', 'typing', 'matching', 'srs', 'kanji-writing'].includes(path)) {
       Storage.setLastMode(path);
       Storage.incrementModeUsage(path);
     }
@@ -112,6 +122,7 @@ const App = (() => {
       case 'typing': renderTyping(app); break;
       case 'matching': renderMatching(app); break;
       case 'kanji': renderKanji(app); break;
+      case 'kanji-writing': renderKanjiWriting(app, queryParams); break;
       case 'srs': renderSRS(app); break;
       default: renderDashboard(app); break;
     }
@@ -1407,6 +1418,7 @@ const App = (() => {
           <button class="btn btn-secondary btn-sm" id="back-to-kanji">← Back to Kanji List</button>
           <div class="kanji-detail-char">${char}</div>
           <span class="tag tag-${mastery}" style="display: block; text-align: center; margin-bottom: 1rem; width: fit-content; margin-left: auto; margin-right: auto;">${mastery}</span>
+          <a href="#/kanji-writing?char=${encodeURIComponent(char)}" class="btn btn-primary" id="practice-writing-btn" style="display: block; text-align: center; margin-bottom: 1.5rem; width: fit-content; margin-left: auto; margin-right: auto;">🖌️ Practice Writing</a>
 
           <div class="kanji-detail-section">
             <div class="kanji-detail-section-title">Meanings</div>
@@ -1434,6 +1446,426 @@ const App = (() => {
     }
 
     renderBrowse();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // KANJI WRITING PRACTICE
+  // ═══════════════════════════════════════════════════════════
+
+  function renderKanjiWriting(container, queryParams) {
+    if (typeof KanjiHelper === 'undefined') {
+      container.innerHTML = emptyState('Kanji module not loaded', 'Please refresh the page.');
+      return;
+    }
+
+    if (typeof HanziWriter === 'undefined') {
+      container.innerHTML = emptyState(
+        'Kanji Writing module could not be loaded',
+        'This feature requires an active internet connection to load the writing canvas from CDN. Please check your network and refresh the page.'
+      );
+      return;
+    }
+
+    const kanjiList = KanjiHelper.getKanjiList();
+    const char = queryParams.char ? queryParams.char.trim() : null;
+
+    let transitionTimer = null;
+    let writerInstance = null;
+
+    currentCleanup = () => {
+      if (transitionTimer) {
+        clearInterval(transitionTimer);
+        transitionTimer = null;
+      }
+      writerInstance = null;
+      delete window.currentTestWriter;
+      delete window.currentTestChar;
+      delete window.currentTestPhase;
+      delete window.currentTestNext;
+    };
+
+    if (!char) {
+      renderSelector();
+      return;
+    }
+
+    const detail = KanjiHelper.getKanjiDetail(char);
+    if (!detail) {
+      container.innerHTML = `
+        <div class="view-header">
+          <a href="#/kanji" class="btn btn-secondary btn-sm">← Back to Kanji List</a>
+          <h1 style="margin-top: 1rem;">Kanji Not Found</h1>
+          <p>The character "${char}" is not in our N5 Kanji database.</p>
+        </div>
+      `;
+      return;
+    }
+
+    renderPractice();
+
+    function renderSelector() {
+      container.innerHTML = `
+        <div class="kanji-writing-view">
+          <div class="view-header">
+            <a href="#/kanji" class="btn btn-secondary btn-sm" style="margin-bottom: var(--space-md); display: inline-flex; align-items: center; gap: 0.5rem;">← Back to Kanji List</a>
+            <h1>🖌️ Kanji Writing Practice</h1>
+            <p class="view-subtitle">Select a Kanji character to practice drawing</p>
+          </div>
+          ${renderInstructions('About Kanji Writing', [
+            'Practice writing characters using the correct stroke order and direction.',
+            'Phase 1: Trace Mode shows a faint outline with numbered guides. The stroke snaps when correct.',
+            'Phase 2: Memory Mode hides all guides. You must draw the character from memory.',
+            'Complete Phase 2 successfully to improve the Kanji\'s mastery level.'
+          ])}
+          <div class="kanji-selection-panel washi-card" style="padding: var(--space-xl); background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); margin-top: var(--space-lg);">
+            <div class="kanji-grid">
+              ${kanjiList.map(k => {
+                const mastery = Storage.getKanjiMasteryLevel(k.character);
+                return `<a href="#/kanji-writing?char=${encodeURIComponent(k.character)}" class="kanji-card ${mastery}" title="${k.meanings.slice(0,2).join(', ')}">${k.character}</a>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPractice() {
+      const mastery = Storage.getKanjiMasteryLevel(char);
+      const isDark = document.body.classList.contains('dark');
+
+      const currentIndex = kanjiList.findIndex(k => k.character === char);
+      let nextChar = null;
+      if (currentIndex !== -1 && currentIndex < kanjiList.length - 1) {
+        nextChar = kanjiList[currentIndex + 1].character;
+      }
+
+      container.innerHTML = `
+        <div class="kanji-writing-view">
+          <div class="view-header">
+            <a href="#/kanji" class="btn btn-secondary btn-sm" style="margin-bottom: var(--space-sm); display: inline-flex; align-items: center; gap: 0.5rem;">← Back to Kanji List</a>
+            <h1>🖌️ Kanji Writing Practice</h1>
+            <p class="view-subtitle">Phase 1: Trace Outline</p>
+          </div>
+
+          <div class="kanji-writing-container">
+            <div class="kanji-writing-sidebar">
+              <div class="kanji-info-card washi-card">
+                <div class="kanji-info-char">${char}</div>
+                <div class="kanji-info-meta">
+                  <span class="tag tag-${mastery}" style="display: inline-block; margin-bottom: var(--space-sm);">${mastery}</span>
+                  <div class="kanji-info-readings"><strong>Readings:</strong> ${detail.readings.join(', ')}</div>
+                  <div class="kanji-info-meanings"><strong>Meanings:</strong> ${detail.meanings.join(', ')}</div>
+                </div>
+              </div>
+
+              <div class="kanji-controls-card washi-card">
+                <button class="btn btn-secondary btn-block" id="btn-show-guide">📖 Show Guide</button>
+                <button class="btn btn-secondary btn-block" id="btn-toggle-outline">👁️ Toggle Outline</button>
+                <button class="btn btn-secondary btn-block" id="btn-reset-canvas">🔄 Reset Canvas</button>
+                <button class="btn btn-secondary btn-block" id="btn-skip-phase">➡️ Skip to Memory Mode</button>
+                <button class="btn btn-secondary btn-block" id="btn-back-to-trace" style="display: none;">⬅️ Back to Trace Mode</button>
+                ${nextChar ? `<a href="#/kanji-writing?char=${encodeURIComponent(nextChar)}" class="btn btn-secondary btn-block" id="btn-next-kanji">Next Kanji ➔</a>` : ''}
+              </div>
+            </div>
+
+            <div class="kanji-canvas-card washi-card">
+              <div class="canvas-phase-indicator" id="canvas-phase-indicator">
+                <span class="phase-badge active" id="badge-phase1">Phase 1: Trace Outline</span>
+                <span class="phase-badge" id="badge-phase2">Phase 2: Draw from Memory</span>
+              </div>
+
+              <div class="kanji-canvas-wrapper">
+                <div id="kanji-writer-target"></div>
+                
+                <div class="canvas-transition-overlay" id="canvas-transition-overlay" style="display: none;">
+                  <div class="transition-box">
+                    <div class="transition-icon">🌸</div>
+                    <div class="transition-title">Trace Complete!</div>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--space-sm);">Now let's try writing it from memory.</p>
+                    <div class="transition-countdown" id="transition-countdown">3</div>
+                    <button class="btn btn-primary btn-sm" id="btn-transition-start">Start Now</button>
+                  </div>
+                </div>
+
+                <div class="canvas-transition-overlay" id="victory-overlay" style="display: none;">
+                  <div class="transition-box">
+                    <div class="transition-icon">🌸🎉</div>
+                    <div class="transition-title">Kanji Mastered!</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--space-sm);">You successfully drew <strong>${char}</strong> from memory!</p>
+                    <div class="mastery-update-info" id="mastery-update-info" style="font-size: 0.8rem; margin-bottom: var(--space-sm); color: var(--accent-gold);"></div>
+                    <div class="victory-actions">
+                      <button class="btn btn-primary btn-sm" id="btn-victory-replay" style="flex: 1; padding: 6px 10px; font-size: 0.8rem;">Practice Again</button>
+                      ${nextChar ? `<a href="#/kanji-writing?char=${encodeURIComponent(nextChar)}" class="btn btn-secondary btn-sm" id="btn-victory-next" style="flex: 1; padding: 6px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">Next ➔</a>` : ''}
+                    </div>
+                    <a href="#/kanji" class="victory-back-link">← Back to Kanji List</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kanji-writing-feedback" id="writing-feedback">Loading character data...</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      initWriter();
+    }
+
+    function initWriter() {
+      const isDark = document.body.classList.contains('dark');
+      const outlineColor = isDark ? '#4a4844' : '#c4beb7';
+      const strokeColor = isDark ? '#f5f4ef' : '#262626';
+      const highlightColor = isDark ? '#8cd9a7' : '#2e7d32';
+
+      const target = document.getElementById('kanji-writer-target');
+      if (!target) return;
+      target.innerHTML = '';
+
+      const writer = HanziWriter.create('kanji-writer-target', char, {
+        width: 300,
+        height: 300,
+        showOutline: true,
+        showCharacter: false,
+        strokeColor: strokeColor,
+        outlineColor: outlineColor,
+        drawingColor: strokeColor,
+        highlightColor: highlightColor,
+        strokeFadeDuration: 200,
+        strokeWidth: 10,
+        drawingWidth: 10,
+        padding: 25
+      });
+
+      writerInstance = writer;
+      window.currentTestWriter = writer;
+      window.currentTestChar = char;
+      window.currentTestPhase = 1;
+      
+      const kanjiList = KanjiHelper.getKanjiList();
+      const currentIndex = kanjiList.findIndex(k => k.character === char);
+      if (currentIndex !== -1 && currentIndex < kanjiList.length - 1) {
+        window.currentTestNext = kanjiList[currentIndex + 1].character;
+      } else {
+        window.currentTestNext = null;
+      }
+
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        const originalOnClick = themeToggle.onclick;
+        themeToggle.onclick = (e) => {
+          if (originalOnClick) originalOnClick(e);
+          setTimeout(() => {
+            const isDarkNew = document.body.classList.contains('dark');
+            const oCol = isDarkNew ? '#4a4844' : '#c4beb7';
+            const sCol = isDarkNew ? '#f5f4ef' : '#262626';
+            const hCol = isDarkNew ? '#8cd9a7' : '#2e7d32';
+            if (writerInstance) {
+              writerInstance.updateColor('outlineColor', oCol);
+              writerInstance.updateColor('strokeColor', sCol);
+              writerInstance.updateColor('drawingColor', sCol);
+              writerInstance.updateColor('highlightColor', hCol);
+            }
+          }, 50);
+        };
+      }
+
+      startPhase1();
+
+      if (queryParams.test === 'true') {
+        console.log('Test mode enabled. Injecting test script...');
+        const existingScript = document.getElementById('test-script-runner');
+        if (existingScript) existingScript.remove();
+        
+        const testScript = document.createElement('script');
+        testScript.id = 'test-script-runner';
+        testScript.src = 'scratch/test_kanji_writing.js';
+        document.body.appendChild(testScript);
+      }
+    }
+
+    function startPhase1() {
+      window.currentTestPhase = 1;
+      const subtitle = document.querySelector('.kanji-writing-view .view-subtitle');
+      if (subtitle) subtitle.textContent = 'Phase 1: Trace Outline';
+      
+      document.getElementById('badge-phase1').className = 'phase-badge active';
+      document.getElementById('badge-phase2').className = 'phase-badge';
+
+      document.getElementById('btn-skip-phase').style.display = '';
+      document.getElementById('btn-back-to-trace').style.display = 'none';
+      document.getElementById('canvas-transition-overlay').style.display = 'none';
+      document.getElementById('victory-overlay').style.display = 'none';
+
+      writerInstance.showOutline();
+      
+      const feedback = document.getElementById('writing-feedback');
+      feedback.textContent = 'Draw each stroke along the guides.';
+      feedback.className = 'kanji-writing-feedback';
+
+      writerInstance.quiz({
+        showOutline: true,
+        onMistake: function(strokeData) {
+          feedback.textContent = `❌ Match the stroke direction! (Stroke ${strokeData.strokeNum + 1})`;
+          feedback.className = 'kanji-writing-feedback error';
+        },
+        onCorrectStroke: function(strokeData) {
+          const current = strokeData.strokeNum + 1;
+          const total = strokeData.strokeNum + strokeData.strokesRemaining + 1;
+          feedback.textContent = `✓ Nice! Correct stroke ${current} of ${total}.`;
+          feedback.className = 'kanji-writing-feedback success';
+        },
+        onComplete: function() {
+          feedback.textContent = '✓ Phase 1 complete!';
+          feedback.className = 'kanji-writing-feedback success';
+          triggerTransition();
+        }
+      });
+
+      setupControls(1);
+    }
+
+    function triggerTransition() {
+      const overlay = document.getElementById('canvas-transition-overlay');
+      const countdownText = document.getElementById('transition-countdown');
+      overlay.style.display = 'flex';
+      
+      let countdown = 3;
+      countdownText.textContent = countdown;
+
+      if (transitionTimer) clearInterval(transitionTimer);
+      transitionTimer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(transitionTimer);
+          transitionTimer = null;
+          startPhase2();
+        } else {
+          countdownText.textContent = countdown;
+        }
+      }, 1000);
+
+      document.getElementById('btn-transition-start').onclick = () => {
+        if (transitionTimer) clearInterval(transitionTimer);
+        transitionTimer = null;
+        startPhase2();
+      };
+    }
+
+    function startPhase2() {
+      window.currentTestPhase = 2;
+      const subtitle = document.querySelector('.kanji-writing-view .view-subtitle');
+      if (subtitle) subtitle.textContent = 'Phase 2: Write from Memory';
+
+      document.getElementById('badge-phase1').className = 'phase-badge';
+      document.getElementById('badge-phase2').className = 'phase-badge active';
+
+      document.getElementById('btn-skip-phase').style.display = 'none';
+      document.getElementById('btn-back-to-trace').style.display = '';
+      document.getElementById('canvas-transition-overlay').style.display = 'none';
+      document.getElementById('victory-overlay').style.display = 'none';
+
+      writerInstance.hideOutline();
+
+      const feedback = document.getElementById('writing-feedback');
+      feedback.textContent = 'Draw the character from memory (guides hidden).';
+      feedback.className = 'kanji-writing-feedback';
+
+      writerInstance.quiz({
+        showOutline: false,
+        onMistake: function(strokeData) {
+          feedback.textContent = `❌ Try that stroke again. (Mistakes: ${strokeData.mistakesOnStroke})`;
+          feedback.className = 'kanji-writing-feedback error';
+        },
+        onCorrectStroke: function(strokeData) {
+          const current = strokeData.strokeNum + 1;
+          const total = strokeData.strokeNum + strokeData.strokesRemaining + 1;
+          feedback.textContent = `✓ Correct! Stroke ${current}/${total}.`;
+          feedback.className = 'kanji-writing-feedback success';
+        },
+        onComplete: function() {
+          feedback.textContent = '🎉 Congratulations! You wrote it correctly!';
+          feedback.className = 'kanji-writing-feedback success';
+          triggerVictory();
+        }
+      });
+
+      setupControls(2);
+    }
+
+    function triggerVictory() {
+      const progress = Storage.updateKanjiProgress(char, true);
+      const mastery = Storage.getKanjiMasteryLevel(char);
+
+      const overlay = document.getElementById('victory-overlay');
+      overlay.style.display = 'flex';
+
+      const infoText = document.getElementById('mastery-update-info');
+      if (infoText) {
+        infoText.innerHTML = `
+          Progress updated! Mastery: <strong>${mastery.toUpperCase()}</strong><br/>
+          (Correct: ${progress.correct}, Incorrect: ${progress.incorrect})
+        `;
+      }
+
+      document.getElementById('btn-victory-replay').onclick = () => {
+        overlay.style.display = 'none';
+        initWriter();
+      };
+    }
+
+    function setupControls(phase) {
+      const showGuideBtn = document.getElementById('btn-show-guide');
+      const toggleOutlineBtn = document.getElementById('btn-toggle-outline');
+      const resetBtn = document.getElementById('btn-reset-canvas');
+      const skipBtn = document.getElementById('btn-skip-phase');
+      const backBtn = document.getElementById('btn-back-to-trace');
+
+      if (showGuideBtn) {
+        const newShowGuide = showGuideBtn.cloneNode(true);
+        showGuideBtn.parentNode.replaceChild(newShowGuide, showGuideBtn);
+        newShowGuide.onclick = () => {
+          if (writerInstance) writerInstance.animateCharacter();
+        };
+      }
+
+      if (toggleOutlineBtn) {
+        const newToggle = toggleOutlineBtn.cloneNode(true);
+        toggleOutlineBtn.parentNode.replaceChild(newToggle, toggleOutlineBtn);
+        let outlineVisible = phase === 1;
+        newToggle.onclick = () => {
+          outlineVisible = !outlineVisible;
+          if (outlineVisible) {
+            writerInstance.showOutline();
+          } else {
+            writerInstance.hideOutline();
+          }
+        };
+      }
+
+      if (resetBtn) {
+        const newReset = resetBtn.cloneNode(true);
+        resetBtn.parentNode.replaceChild(newReset, resetBtn);
+        newReset.onclick = () => {
+          if (phase === 1) {
+            startPhase1();
+          } else {
+            startPhase2();
+          }
+        };
+      }
+
+      if (skipBtn) {
+        skipBtn.onclick = () => {
+          startPhase2();
+        };
+      }
+
+      if (backBtn) {
+        backBtn.onclick = () => {
+          startPhase1();
+        };
+      }
+    }
   }
 
   // ═══════════════════════════════════════════════════════════

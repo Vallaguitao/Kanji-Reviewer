@@ -1,7 +1,7 @@
 /**
  * kanji.js — Kanji Extraction & Quiz Helper
  *
- * Auto-extracts unique kanji characters from the N5_VOCABULARY global array,
+ * Auto-extracts unique kanji characters from the VOCABULARY global array,
  * collects associated readings, meanings, and source words, and provides
  * quiz-pool generators for hiragana↔kanji drills.
  *
